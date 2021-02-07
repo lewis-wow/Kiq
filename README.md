@@ -1,6 +1,10 @@
 # Kiq.js
 Blazing fast virtual DOM class component based library for reactive UI
 
+## Thanks :heart:
+Jáchym Janoušek    
+Jan Turoň
+
 ## Javascript should not be pain
 This library allows you to don't care about DOM and DOM updates, you will only work with data and leave DOM on us.
 Every DOM changes are done surgically and every virtual node is hooked on real node on page, so you can use third-party libraries in combination with this library (Avoid manipulate Kiq real nodes, else Kiq is confused). 
