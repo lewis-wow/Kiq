@@ -2,13 +2,14 @@
 Blazing fast virtual DOM class component based library for reactive UI
 
 ## Javascript should not be pain
-This library allows you to don't care about DOM and DOM updates, you will only work with data and leave DOM on us
+This library allows you to don't care about DOM and DOM updates, you will only work with data and leave DOM on us.
+Every DOM changes are done surgically and every virtual node is hooked on real node on page, so you can use third-party libraries in combination with this library (Avoid manipulate Kiq real nodes, else Kiq is confused). 
 
 ## What about speeeeeeed?
 Kiq.js is faster than libraries that doing same thing like React.js, Vue.js, etc...
 
 ## How can be faster than these libraries?
-It is optimized by requestAnimationFrame, bundling DOM changes into one bundle and do it in one time, so browser don't recalculate reflow and repaint every time, small size (under 2Kb min + gzip) and simple data control.
+It is optimized by requestAnimationFrame so when there are DOM changes, browser is ready to reflow and repaint, bundling DOM changes into one bundle and do it in one time, so browser don't reflow and repaint every time, small size (under 2Kb min + gzip) and simple data control.
 
 ## Can this library be faster than Svelte?
 Svelte is compiler and Kiq is javascript library, but sometimes Kiq can be faster and smaller than Svelte bundle.
