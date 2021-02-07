@@ -5,12 +5,22 @@ Blazing fast virtual DOM class component based library for reactive UI
 [Jáchym Janoušek](https://github.com/jachymjanousek)    
 [Jan Turoň](https://github.com/janturon)
 
+## Inspiration
+React.js for virtual DOM, components and performance tips    
+Jason Yu that creates simple virtual DOM library in about 50 minutes    
+Solid.js for performance tips    
+
+## goal
+Goal is to create very simple, lightweight and very fast virtual DOM library with smart diff algorithm and performance optimalizations.
+
 ## Javascript should not be pain
 This library allows you to don't care about DOM and DOM updates, you will only work with data and leave DOM on us.
 Every DOM changes are done surgically and every virtual node is hooked on real node on page, so you can use third-party libraries in combination with this library (Avoid manipulate Kiq real nodes, else Kiq is confused). 
 
 ## What about speeeeeeed?
 Kiq.js is faster than libraries that doing same thing like React.js, Vue.js, etc...
+
+Create 1000 rows on 8gb ram, no throtling - Kiq.js: 257ms, React.js: 425ms
 
 ## How can be faster than these libraries?
 It is optimized by requestAnimationFrame so when there are DOM changes, browser is ready to reflow and repaint, bundling DOM changes into one bundle and do it in one time, so browser don't reflow and repaint every time, small size (under 2Kb min + gzip) and simple data control.
