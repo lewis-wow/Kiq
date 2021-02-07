@@ -2,7 +2,7 @@
 Blazing fast virtual DOM class component based library for reactive UI
 
 ## Thanks :heart:
-[Jáchym Janoušek]()
+[Jáchym Janoušek](https://github.com/jachymjanousek)    
 [Jan Turoň](https://github.com/janturon)
 
 ## Javascript should not be pain
