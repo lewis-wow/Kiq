@@ -20,7 +20,7 @@ Every DOM changes are done surgically and every virtual node is hooked on real n
 ## What about speeeeeeed?
 Kiq.js is faster than libraries that doing same thing like React.js, Vue.js, etc...
 
-Create 1000 rows on 8gb ram, no throtling - Kiq.js: 257ms, React.js: 425ms
+Create 1000 rows on 8gb ram, no throttling - Kiq.js: 257ms, React.js: 425ms
 
 ## How can be faster than these libraries?
 It is optimized by requestAnimationFrame so when there are DOM changes, browser is ready to reflow and repaint, bundling DOM changes into one bundle and do it in one time, so browser don't reflow and repaint every time, small size (under 2Kb min + gzip) and simple data control.
