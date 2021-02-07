@@ -1,4 +1,4 @@
-# Kiq
+# Kiq.js
 Blazing fast virtual node component based library
 
 ## Javascript should not be pain
