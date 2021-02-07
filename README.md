@@ -2,8 +2,8 @@
 Blazing fast virtual DOM class component based library for reactive UI
 
 ## Thanks :heart:
-Jáchym Janoušek    
-Jan Turoň
+[Jáchym Janoušek]()
+[Jan Turoň](https://github.com/janturon)
 
 ## Javascript should not be pain
 This library allows you to don't care about DOM and DOM updates, you will only work with data and leave DOM on us.
