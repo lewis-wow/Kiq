@@ -19,8 +19,34 @@ Every DOM changes are done surgically and every virtual node is hooked on real n
 
 ## What about speeeeeeed?
 Kiq.js is faster than libraries that doing same thing like React.js, Vue.js, etc...
+Every test has 2x warmup run.
 
-Create 1000 rows on 8gb ram, no throttling - Kiq.js: 197ms, React.js: 403ms
+Create 1000 rows on 8gb ram, no throttling - Kiq.js: 257ms, React.js: 425ms
+Remove 1000 rows - Kiq.js: 39ms, React.js: 55ms
+Create 10000 rows - Kiq.js: 1050ms, React.js: 1329ms
+Appending 1000 rows to 10000 rows - Kiq.js: 363ms, React.js: 758ms 
+
+Row component:
+```
+class Row extends Kiq.Component {
+
+    Element() {
+
+        const data = this.props.data;
+
+        return html`<tr className>
+			<td className="col-md-1">${data.id}</td>
+			<td className="col-md-4">
+				<a>${data.label}</a>
+			</td>
+			<td className="col-md-1"><a><span className="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td>
+			<td className="col-md-6"></td>
+		</tr>`
+
+    }
+
+}
+```
 
 ## How can be faster than these libraries?
 It is optimized by requestAnimationFrame so when there are DOM changes, browser is ready to reflow and repaint, bundling DOM changes into one bundle and do it in one time, so browser don't reflow and repaint every time, small size (under 2Kb min + gzip) and simple data control.
