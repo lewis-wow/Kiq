@@ -19,7 +19,7 @@ Every DOM changes are done surgically and every virtual node is hooked on real n
 
 ## What about speeeeeeed?
 Kiq.js is faster than libraries that doing same thing like React.js, Vue.js, etc...
-Every test has 2x warmup run.
+Every test has 2x warmup run and every row (component) is keyed.
 
 Create 1000 rows on 8gb ram, no throttling - Kiq.js: 257ms, React.js: 425ms    
 Remove 1000 rows - Kiq.js: 39ms, React.js: 55ms    
