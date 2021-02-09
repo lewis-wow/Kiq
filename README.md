@@ -8,7 +8,7 @@ Blazing fast virtual DOM class component based library for reactive UI
 ## Download
 
 [![](https://data.jsdelivr.com/v1/package/npm/kiq/badge)](https://www.jsdelivr.com/package/npm/kiq)    
-[![npm version](https://badge.fury.io/js/kiq.svg)](https://badge.fury.io/js/kiq)
+[![npm version](https://badge.fury.io/js/kiq.svg)](https://badge.fury.io/js/kiq)    
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 
