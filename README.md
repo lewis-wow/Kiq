@@ -5,6 +5,17 @@ Blazing fast virtual DOM class component based library for reactive UI
 [Jáchym Janoušek](https://github.com/jachymjanousek)    
 [Jan Turoň](https://github.com/janturon)
 
+## Download
+NPM: 
+```
+npm i kiq
+```
+
+CDN: 
+```
+<script src="https://cdn.jsdelivr.net/npm/kiq@0.0.2/Kiq.min.js"></script>
+```
+
 ## Inspiration
 React.js for virtual DOM, components and performance tips    
 Jason Yu that creates simple virtual DOM library in about 50 minutes    
