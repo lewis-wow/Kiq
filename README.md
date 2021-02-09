@@ -65,4 +65,5 @@ Components are simple javascript classes (constructor functions).
 
 ## Why classes, not functions?
 Because classes are better for component lifecycles, clearer encapsulation and for recognizing components and another classes and functions.
+The second reason is that the classes are faster in complex data because in function all hooks function trigger again, in classes there are no hooks, so on every rerender trigger only Element method with virtual node.
 
