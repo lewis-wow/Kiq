@@ -6,16 +6,9 @@ Blazing fast virtual DOM class component based library for reactive UI
 [Jan Turoň](https://github.com/janturon)
 
 ## Download
-NPM: 
-```
-npm i kiq
-```
 
-CDN: 
 [![](https://data.jsdelivr.com/v1/package/npm/kiq/badge)](https://www.jsdelivr.com/package/npm/kiq)
-```
-<script src="https://cdn.jsdelivr.net/npm/kiq@0.0.2/Kiq.min.js"></script>
-```
+[![npm version](https://badge.fury.io/js/kiq.svg)](https://badge.fury.io/js/kiq)
 
 ## Inspiration
 React.js for virtual DOM, components and performance tips    
