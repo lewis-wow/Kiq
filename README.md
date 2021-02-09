@@ -7,9 +7,12 @@ Blazing fast virtual DOM class component based library for reactive UI
 
 ## Download
 
-[![](https://data.jsdelivr.com/v1/package/npm/kiq/badge)](https://www.jsdelivr.com/package/npm/kiq)
+[![](https://data.jsdelivr.com/v1/package/npm/kiq/badge)](https://www.jsdelivr.com/package/npm/kiq)    
 [![npm version](https://badge.fury.io/js/kiq.svg)](https://badge.fury.io/js/kiq)
 
+```
+<script src="https://cdn.jsdelivr.net/npm/kiq@0.0.2/Kiq.min.js"></script>
+```
 ## Inspiration
 React.js for virtual DOM, components and performance tips    
 Jason Yu that creates simple virtual DOM library in about 50 minutes    
