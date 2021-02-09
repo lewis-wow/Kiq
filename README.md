@@ -12,6 +12,7 @@ npm i kiq
 ```
 
 CDN: 
+[![](https://data.jsdelivr.com/v1/package/npm/kiq/badge)](https://www.jsdelivr.com/package/npm/kiq)
 ```
 <script src="https://cdn.jsdelivr.net/npm/kiq@0.0.2/Kiq.min.js"></script>
 ```
