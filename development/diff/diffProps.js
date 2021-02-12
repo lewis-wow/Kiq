@@ -24,7 +24,7 @@ export default function diffProps(oldProps, newProps) {
 
             if (isEvent(key)) {
 
-                if (!(key in oldProps)) {
+                if (!(key in oldProps) || oldProps[key] !== newProps[key]) {
 
                     propsPatches.push(function (node) {
 
@@ -97,7 +97,7 @@ export default function diffProps(oldProps, newProps) {
     Object.keys(oldProps)
         .filter(isProperty)
         .forEach(key => {
-            if (!(key in newProps)) {
+            if (!(key in newProps)  || oldProps[key] !== newProps[key]) {
 
                 if (isEvent(key)) { // is event, remove event listener
 
