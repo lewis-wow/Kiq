@@ -303,3 +303,40 @@ class List extends Kiq.Component {
 
 }
 ```
+
+### Simple mouse move
+Simple mouse move example to show how easy is declarative way of DOM changes.
+Declarative programming means you say what to do, but no how to do.
+
+```
+class MouseMove extends Kiq.Component {
+
+    state = {
+        x: 0,
+        y: 0,
+        count: 0
+    };
+
+    onComponentRender() {
+
+        window.addEventListener('mousemove', e => {
+
+            this.setState({
+
+                x: e.x,
+                y: e.y
+
+            });
+
+        });
+
+    }
+
+    Element(props, state) {
+
+        return html`<button onclick=${ e => this.setState({ count: state.count + 1 }) } style=${{ position: "absolute", left: this.state.x + "px", top: this.state.y + "px" }}>${ state.count }</button>`;
+
+    }
+
+}
+```
