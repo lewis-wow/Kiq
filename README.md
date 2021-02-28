@@ -243,3 +243,39 @@ class Child extends Kiq.Component {
     }
 }
 ```
+
+### Conditional rendering
+```
+class Fetch extends Kiq.Component {
+
+    state = {
+        books: null
+    };
+
+    onComponentRender() {
+
+        fetch('https://www.anapioficeandfire.com/api/books').then(res => res.json()).then(res => {
+
+            this.setState({
+                books: res
+            });
+
+        });
+
+
+    }
+
+    Element() {
+
+        if(!this.state.books) {
+
+            return html`<h1>Loading...</h1>`;
+
+        }
+
+        return html`<div>${ JSON.stringify(this.state.books) }</div>`
+
+    }
+
+}
+```
