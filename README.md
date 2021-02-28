@@ -199,8 +199,9 @@ State are reactive object, props are non reactive object, props should be only r
 Component.setState component method can be only called if component is rendered, will mount or is mounted, else it throws error.
 You shouldn't to mutate the original value of state as you can see in the example, instead of ```++state.count``` use 
 ```state.count + 1```.
+Every changes should be immutable.
 On every setState call component will rerender, so on multiple changes, use setState only once and do all the changes in one.
-setState is not asynchronnous function.
+setState is synchronnous function.
 
 ### Can I set props?
 No. There is no way to set props, because it is anti-pattern.
@@ -274,6 +275,29 @@ class Fetch extends Kiq.Component {
         }
 
         return html`<div>${ JSON.stringify(this.state.books) }</div>`
+
+    }
+
+}
+```
+### List rendering
+
+```
+class List extends Kiq.Component {
+
+    state = {
+        arr: [0, 1, 2, 3, 4]
+    };
+
+    Element() {
+
+        return (html`
+            <ul>
+                ${ this.state.arr.map(item => {
+                    return html`<li _key=${ item }>${ item }</li>`
+                }) }
+            </ul>
+        `);
 
     }
 
