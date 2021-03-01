@@ -245,6 +245,9 @@ class Child extends Kiq.Component {
 }
 ```
 
+### Kiq.Component vs WebComponents
+WebComponents are encapsulated DOM elements, but Kiq.Component is logical encapsulation of element and data definition, where is used declarative DOM management.
+
 ### Conditional rendering
 ```
 class Fetch extends Kiq.Component {
