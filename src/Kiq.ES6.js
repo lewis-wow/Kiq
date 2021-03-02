@@ -1,9 +1,4 @@
 
-/**
- * Ludvík Prokopec
- * License: MIT
- */
-
 (function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
         typeof define === 'function' && define.amd ? define(factory) :
@@ -171,7 +166,7 @@
     /**
      * this function will trigger the update of component
      */
-    
+
     function createComponentInstance(component) {
     
         const instance = new component.type(component.props);
@@ -229,8 +224,25 @@
         }
     
         if (Object.keys(newStateFromSetter).length) {
-            
-            return createComponentUpdate(component, newStateFromSetter);
+            const update = updateComponent(component, null, newStateFromSetter);
+            //update component return patch which is function and snapshot that is given from getSnapshotBeforeUpdate
+    
+            applyComponentUpdate(update, (patch, snapshot) => {
+    
+                const componentInternals = component._internals;
+    
+                const patchedChild = patch(componentInternals.realDOM);
+    
+                Object.assign(componentInternals, {
+                    virtualNode: patchedChild.virtualNode,
+                    realDOM: patchedChild.realDOM
+                });
+    
+                component.onComponentUpdate(snapshot);
+    
+            }, null);
+    
+            return component;
     
         }
     
@@ -305,6 +317,7 @@
     }
 
     function updateComponent(oldComponent, nextProps, nextState) {
+
         /**
          * newComponent is plain javascript object { type, props, _key }
          * we use the new props that we can get updated from parent component
@@ -396,27 +409,24 @@
             for (let i = 0; i < children.length; i++) {
     
                 const elementDefinition = render(children[i]);
-                
+    
                 if (isArray(elementDefinition)) {
     
                     mountArrays(elementDefinition, el);
     
                 } else {
     
-                    mount(elementDefinition,
-                        el,
-                        () => {
-                            el.appendChild(elementDefinition.realDOM);
-                        });
-    
+                    mount(elementDefinition, el, () => el.appendChild(elementDefinition.realDOM));
+                    
                 }
     
                 resChildren.push(elementDefinition);
     
-    
             }
     
         }
+    
+        const key = virtualNode._key;
     
         return {
             virtualNode: {
@@ -427,22 +437,18 @@
                 }
             },
             realDOM: el,
-            _key: virtualNode._key,
+            _key: key,
             _ref: virtualNode._ref
         };
     }
     
     function mountArrays(elementDefinition, el) {
-        
+    
         for (let j = 0; j < elementDefinition.length; j++) {
             const singleElementDefinition = elementDefinition[j];
     
-            mount(singleElementDefinition,
-                el,
-                () => {
-                    el.appendChild(singleElementDefinition.realDOM);
-                });
-    
+            mount(singleElementDefinition, el, () => el.appendChild(singleElementDefinition.realDOM));
+                
         }
     
     }
@@ -454,7 +460,6 @@
         if (isObject(virtualNode) && isComponent(virtualNode.type)) {
     
             const componentIntarnals = virtualNode._internals;
-    
             virtualNode.onComponentWillMount(componentIntarnals.realDOM, container);
     
             mounterFunction();
@@ -466,8 +471,6 @@
             mounterFunction();
         }
     
-        return newNodeDefinition;
-    
     }
 
     function render(virtualNode) {
@@ -475,7 +478,6 @@
         /**
          * if virtual dom is undefined return no dom object
          */
-        
         if (isNullOrUndef(virtualNode)) {
     
             throw Error(`virtual node cannot be null or undefined`);
@@ -524,9 +526,7 @@
             const component = createComponentInstance(virtualNode);
             const componentInternals = component._internals;
             //component 
-    
             const newNodeDefinition = render(componentInternals.virtualNode);
-    
             Object.assign(componentInternals, newNodeDefinition);
     
             /**
@@ -535,7 +535,7 @@
              */
             component.onComponentRender(newNodeDefinition.realDOM);
     
-            component.setState = setter => setState(component, setter);
+            component.setState = (setter) => setState(component, setter);
     
             return {
                 virtualNode: component,
@@ -1089,9 +1089,9 @@
         Object.keys(oldProps)
             .filter(isProperty)
             .forEach(key => {
-                if (!(key in newProps)  || oldProps[key] !== newProps[key]) {
+                if (isEvent(key)) {
     
-                    if (isEvent(key)) { // is event, remove event listener
+                    if (!(key in newProps) || oldProps[key] !== newProps[key]) { // is event, remove event listener
     
                         propsPatches.push(function (node) {
     
@@ -1099,16 +1099,14 @@
     
                         });
     
-                    } else { // else remove attribute from element
-    
-                        propsPatches.push(function (node) {
-    
-                            node[key] = null;
-                            node.removeAttribute(key);
-    
-                        });
-    
                     }
+                } else if (!(key in newProps)) { // else remove attribute from element
+    
+                    propsPatches.push(function (node) {
+    
+                        node[key] = null;
+    
+                    });
     
                 }
             });
@@ -1162,39 +1160,61 @@
     
     }
     
+    function renderToPage(virtualElement, container, callback) {
+
+        window.requestAnimationFrame(() => {
+
+            if (!container || container.nodeType !== Node.ELEMENT_NODE) {
+
+                throw TypeError(`render(...) container must be valid Element that is already rendered on page, try to use DOMContentLoaded event on window to wait for all Elements load`);
+
+            }
+
+            const newNodeDefinition = render(virtualElement);
+
+            callback(newNodeDefinition);
+
+        });
+
+    }
+
     return {
 
         Component,
 
         render: function (virtualElement, container, callback) {
 
-            window.requestAnimationFrame(() => {
+            renderToPage(virtualElement, container, newNodeDefinition => {
 
-                if (!container || container.nodeType !== Node.ELEMENT_NODE) {
+                mount(newNodeDefinition, container, () => container.appendChild(newNodeDefinition.realDOM));
 
-                    throw TypeError(`render(...) container must be valid Element that is already rendered on page, try to use DOMContentLoaded event on window to wait for all Elements load`);
+                if(callback) {
+
+                    callback();
 
                 }
+                
+            });
 
-                const newNodeDefinition = render(virtualElement);
+        },
 
-                mount(newNodeDefinition.virtualNode,
-                    container,
-                    () => {
-                        container.appendChild(newNodeDefinition.realDOM);
-                    });
+        createElement,
 
-                if (callback) {
+        replace: function(virtualElement, container) {
+
+            renderToPage(virtualElement, container, newNodeDefinition => {
+
+                mount(newNodeDefinition, container, () => container.replaceWith(newNodeDefinition.realDOM));
+
+                if(callback) {
 
                     callback();
 
                 }
 
             });
+        }
 
-        },
-
-        createElement
     };
 
 }));
