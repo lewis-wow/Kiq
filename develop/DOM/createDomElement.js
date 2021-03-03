@@ -64,12 +64,8 @@ export default function createDomElement(virtualNode) {
 
             } else {
 
-                mount(elementDefinition,
-                    el,
-                    () => {
-                        el.appendChild(elementDefinition.realDOM);
-                    });
-
+                mount(elementDefinition, el, () => el.appendChild(elementDefinition.realDOM));
+                
             }
 
             resChildren.push(elementDefinition);
@@ -99,11 +95,7 @@ function mountArrays(elementDefinition, el) {
     for (let j = 0; j < elementDefinition.length; j++) {
         const singleElementDefinition = elementDefinition[j];
 
-        mount(singleElementDefinition,
-            el,
-            () => {
-                el.appendChild(singleElementDefinition.realDOM);
-            });
+        mount(singleElementDefinition, el, () => el.appendChild(singleElementDefinition.realDOM));
             
     }
 

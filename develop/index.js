@@ -23,39 +23,48 @@ import render from './DOM/render.js';
 
     "use strict";
 
+    function renderToPage(virtualElement, container, callback) {
+
+        //window.requestAnimationFrame(() => {
+
+            if (!container || container.nodeType !== Node.ELEMENT_NODE) {
+
+                throw TypeError(`render(...) container must be valid Element that is already rendered on page, try to use DOMContentLoaded event on window to wait for all Elements load`);
+
+            }
+
+            const newNodeDefinition = render(virtualElement);
+
+            callback(newNodeDefinition);
+
+        //});
+
+    }
+
     return {
 
         Component,
 
-        render: function (virtualElement, container, callback) {
+        render: function (virtualElement, container) {
 
-            window.requestAnimationFrame(() => {
+            renderToPage(virtualElement, container, newNodeDefinition => {
 
-                if (!container || container.nodeType !== Node.ELEMENT_NODE) {
-
-                    throw TypeError(`render(...) container must be valid Element that is already rendered on page, try to use DOMContentLoaded event on window to wait for all Elements load`);
-
-                }
-
-                const newNodeDefinition = render(virtualElement);
-
-                mount(newNodeDefinition.virtualNode,
-                    container,
-                    () => {
-                        container.appendChild(newNodeDefinition.realDOM);
-                    });
-
-                if (callback) {
-
-                    callback();
-
-                }
+                mount(newNodeDefinition, container, () => container.appendChild(newNodeDefinition.realDOM));
 
             });
 
         },
 
-        createElement
+        createElement,
+
+        replace: function(virtualElement, container) {
+
+            renderToPage(virtualElement, container, newNodeDefinition => {
+
+                mount(newNodeDefinition, container, () => container.replaceWith(newNodeDefinition.realDOM));
+
+            });
+        }
 
     };
 
