@@ -95,4 +95,5 @@ export default function diff(vOldNode, vNewNode) {
         return { virtualNode: vOldNode, realDOM: node, _key: vNewNode._key };
 
     }
+    
 };

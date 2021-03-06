@@ -92,56 +92,91 @@ export default function diffChildren(oldVChildren, newVChildren) {
 
     }
 
-    for (const key in keyedOld) {
+    for (const key in keyedNew) {
 
-        const inOldVChildrenIndex = keyedOld[key];
         const inNewVChildrenIndex = keyedNew[key];
-        const vOldNode = oldVChildren[inOldVChildrenIndex];
+        const vNewNode = newVChildren[inNewVChildrenIndex];
 
-        const childPatch = diff(vOldNode.virtualNode, newVChildren[inNewVChildrenIndex]);
+        if (!(key in keyedOld)) {
 
-        if (childPatch) {
+            const newNodeDefinition = render(vNewNode);
+            updatedVChildren[inNewVChildrenIndex] = newNodeDefinition;
 
-            vOldNode.patch = function (node) {
+            additionalPatches.push(function (parent) {
 
-                const childAfterPatch = childPatch(node);
+                mount(newNodeDefinition, parent, () => parent.insertBefore(newNodeDefinition.realDOM, parent.childNodes[inNewVChildrenIndex]));
 
-                if (childAfterPatch !== undefined) {
-
-                    updatedVChildren[inNewVChildrenIndex] = childAfterPatch;
-
-                }
-
-            };
-
-            childPatches.push(inOldVChildrenIndex);
+            });
 
         } else {
 
-            updatedVChildren[inNewVChildrenIndex] = vOldNode;
+            const inOldVChildrenIndex = keyedOld[key];
+            const vOldNode = oldVChildren[inOldVChildrenIndex];
+
+            let childPatch;
+
+            if(inOldVChildrenIndex === inNewVChildrenIndex) {
+
+                childPatch = diff(vOldNode.virtualNode, vNewNode);
+
+            } else {
+
+                const vOldNodeCross = oldVChildren[inNewVChildrenIndex]; 
+
+                if(vOldNodeCross) {
+
+                    childPatch = diff(vOldNodeCross.virtualNode, vNewNode);
+
+                } else {
+
+                    childPatch = diff(vOldNode.virtualNode, vNewNode);
+
+                }
+
+
+            }
+
+
+            if (childPatch) {
+
+                vOldNode.patch = function (node) {
+    
+                    const childAfterPatch = childPatch(node);
+    
+                    if (childAfterPatch !== undefined) {
+    
+                        childAfterPatch._key = inOldVChildrenIndex;
+                        updatedVChildren[inNewVChildrenIndex] = childAfterPatch;
+    
+                    }
+    
+                };
+    
+                childPatches.push(inOldVChildrenIndex);
+    
+            } else {
+    
+                updatedVChildren[inNewVChildrenIndex] = vOldNode;
+    
+            }
+    
+            delete keyedOld[key];
 
         }
 
-        delete keyedNew[key];
-
     }
 
-    for(const key in keyedNew) {
+    for (const key in keyedOld) {
 
-        const inNewVChildrenIndex = keyedNew[key];
+        const inOldVChildrenIndex = keyedOld[key];
+        const vOldNode = oldVChildren[inOldVChildrenIndex];
 
-        const newNodeDefinition = render(newVChildren[inNewVChildrenIndex]);
-        updatedVChildren[inNewVChildrenIndex] = newNodeDefinition;
 
-        additionalPatches.push(function (parent) {
+        vOldNode.patch = function (node) {
+    
+            node.remove();
 
-            mount(newNodeDefinition, 
-                parent, 
-                () => { 
-                    parent.insertBefore(newNodeDefinition.realDOM, parent.childNodes[inNewVChildrenIndex]);
-                });
-
-        });
+        };
 
     }
 

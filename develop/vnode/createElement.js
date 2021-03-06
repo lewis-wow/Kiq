@@ -17,12 +17,14 @@ export default function createElement(type, props = null, ...children) {
     if("_key" in props) {
 
         _key = props._key.toString();
+        delete props._key;
 
     }
 
     if("_ref" in props) {
 
         _ref = props._ref;
+        delete props._ref;
 
     }
 
