@@ -12,11 +12,11 @@ export default function keyToIndex(arr) {
 
         if(key) {
 
-            if(!(key in keyed)) {
+            //if(!(key in keyed)) {
                 
                 keyed[key] = i;
 
-            }
+            //}
 
         } else {
 
