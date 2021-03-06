@@ -83,6 +83,7 @@ export default function diffProps(oldProps, newProps) {
             propsPatches.push(function (parent) {
 
                 updatedProps.children = childrenPatches(parent);
+                console.log(updatedProps.children);
 
             });
 
@@ -93,6 +94,7 @@ export default function diffProps(oldProps, newProps) {
         }
 
     }
+
 
     Object.keys(oldProps)
         .filter(isProperty)

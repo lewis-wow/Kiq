@@ -23,6 +23,7 @@ export default function diffChildren(oldVChildren, newVChildren) {
     const [keyedOld, freeOld] = keyToIndex(oldVChildren);
     const [keyedNew, freeNew] = keyToIndex(newVChildren);
 
+
     const maxFreeLen = Math.max(freeNew.length, freeOld.length);
 
     for (let i = 0; i < maxFreeLen; i++) {
@@ -54,11 +55,7 @@ export default function diffChildren(oldVChildren, newVChildren) {
 
             additionalPatches.push(function (parent) {
 
-                mount(newNodeDefinition,
-                    parent,
-                    () => {
-                        parent.appendChild(newNodeDefinition.realDOM);
-                    });
+                mount(newNodeDefinition, parent, () => parent.appendChild(newNodeDefinition.realDOM));
 
             });
 
@@ -114,6 +111,8 @@ export default function diffChildren(oldVChildren, newVChildren) {
             const vOldNode = oldVChildren[inOldVChildrenIndex];
 
             let childPatch;
+            let keyToDel = key;
+            let vOldNodeCross;
 
             if(inOldVChildrenIndex === inNewVChildrenIndex) {
 
@@ -121,11 +120,12 @@ export default function diffChildren(oldVChildren, newVChildren) {
 
             } else {
 
-                const vOldNodeCross = oldVChildren[inNewVChildrenIndex]; 
+                if(oldVChildren[inNewVChildrenIndex]) {
 
-                if(vOldNodeCross) {
+                    vOldNodeCross = oldVChildren[inNewVChildrenIndex]; 
 
                     childPatch = diff(vOldNodeCross.virtualNode, vNewNode);
+                    keyToDel = vNewNode._key;
 
                 } else {
 
@@ -139,28 +139,38 @@ export default function diffChildren(oldVChildren, newVChildren) {
 
             if (childPatch) {
 
-                vOldNode.patch = function (node) {
+                const patchFunction = function (node) {
     
                     const childAfterPatch = childPatch(node);
     
                     if (childAfterPatch !== undefined) {
     
-                        childAfterPatch._key = inOldVChildrenIndex;
+                        childAfterPatch._key = inNewVChildrenIndex;
                         updatedVChildren[inNewVChildrenIndex] = childAfterPatch;
     
                     }
     
                 };
-    
-                childPatches.push(inOldVChildrenIndex);
+
+                if(vOldNodeCross) {
+
+                    vOldNodeCross.patch = patchFunction;
+                    childPatches.push(inNewVChildrenIndex);
+
+                } else {
+
+                    vOldNode.patch = patchFunction;
+                    childPatches.push(inOldVChildrenIndex);
+
+                }
     
             } else {
     
                 updatedVChildren[inNewVChildrenIndex] = vOldNode;
     
             }
-    
-            delete keyedOld[key];
+
+            delete keyedOld[keyToDel];
 
         }
 
@@ -171,12 +181,9 @@ export default function diffChildren(oldVChildren, newVChildren) {
         const inOldVChildrenIndex = keyedOld[key];
         const vOldNode = oldVChildren[inOldVChildrenIndex];
 
+        vOldNode.patch = diff(vOldNode.virtualNode, undefined);
 
-        vOldNode.patch = function (node) {
-    
-            node.remove();
-
-        };
+        childPatches.push(inOldVChildrenIndex);
 
     }
 
