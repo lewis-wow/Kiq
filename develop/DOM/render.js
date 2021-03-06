@@ -71,9 +71,9 @@ export default function render(virtualNode) {
          * means if virtual is not element but component, it become Class.Component from {type, props, _key}
          * we must overwrite the virtal beacause of this
          */
-        component.onComponentRender(newNodeDefinition.realDOM);
-
         component.setState = (setter) => setState(component, setter);
+
+        component.onComponentRender(newNodeDefinition.realDOM);
 
         return {
             virtualNode: component,
