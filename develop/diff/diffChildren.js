@@ -96,6 +96,8 @@ export default function diffChildren(oldVChildren, newVChildren) {
 
         if (!(key in keyedOld)) {
 
+            console.log(key, keyedOld);
+
             const newNodeDefinition = render(vNewNode);
             updatedVChildren[inNewVChildrenIndex] = newNodeDefinition;
 
@@ -145,7 +147,6 @@ export default function diffChildren(oldVChildren, newVChildren) {
     
                     if (childAfterPatch !== undefined) {
     
-                        childAfterPatch._key = inNewVChildrenIndex;
                         updatedVChildren[inNewVChildrenIndex] = childAfterPatch;
     
                     }
