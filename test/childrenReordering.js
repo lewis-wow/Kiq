@@ -141,7 +141,7 @@ class List extends Kiq.Component {
 
         return html`<ul>${ state.arr.map((item, i) => {
 
-                    return html`<input value=${ item.val } />`;
+                    return html`<input _key=${ item.id } value=${ item.val } />`;
 
                 }) }</ul>`;
 
