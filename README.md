@@ -1,7 +1,7 @@
 # Kiq.js
 Blazing fast virtual DOM class component based library for reactive UI
 
-![](logo/Kiq.js.logo.png "Kiq.js")
+![](logo/Kiq.js.logo_2.png "Kiq.js")
 
 ## Thanks :heart:
 [Jáchym Janoušek](https://github.com/jachymjanousek)    
