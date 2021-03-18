@@ -3,7 +3,7 @@ import isArray from '../isArray.js';
 import mount from '../DOM/mount.js';
 import render from '../DOM/render.js';
 import keyToIndex from './keyToIndex.js';
-import reorderChildren from './reorderChildren.js';
+import reorderChildren from '../reorder/reorderChildren.js';
 
 
 /**
@@ -21,10 +21,16 @@ export default function diffChildren(oldVChildren, newVChildren) {
 
     const additionalPatches = [];
 
-    const [keyedOld, freeOld] = keyToIndex(oldVChildren);
-    const [keyedNew, freeNew] = keyToIndex(newVChildren);
+    const [keyedOld, freeOld, oldKeysExists] = keyToIndex(oldVChildren);
+    const [keyedNew, freeNew, newKeysExists] = keyToIndex(newVChildren);
 
-    const reorderPatches = reorderChildren(oldVChildren, newVChildren, keyedOld, keyedNew);
+    let reorderPatches = [];
+
+    if(oldKeysExists && newKeysExists) {
+
+        reorderPatches = reorderChildren(oldVChildren, newVChildren, keyedOld, keyedNew);
+
+    }
 
     const maxFreeLen = Math.max(freeNew.length, freeOld.length);
 
@@ -101,7 +107,7 @@ export default function diffChildren(oldVChildren, newVChildren) {
             const newNodeDefinition = render(vNewNode);
             updatedVChildren[inNewVChildrenIndex] = newNodeDefinition;
 
-            additionalPatches.push(function (parent) {
+            additionalPatches[inNewVChildrenIndex] = (function (parent) {
 
                 mount(newNodeDefinition, parent, () => parent.insertBefore(newNodeDefinition.realDOM, parent.childNodes[inNewVChildrenIndex]));
 
@@ -169,21 +175,21 @@ export default function diffChildren(oldVChildren, newVChildren) {
 
             const oldVChild = oldVChildren[childPatches[i]];
 
-            oldVChild.patch(oldVChild.realDOM);
+            oldVChild.patch(oldVChild.realDOM); // patches are hooked
 
         }
 
-        for (let i = 0; i < additionalPatches.length; i++) {
+        for (const key in additionalPatches) { //start on indexes, non keys... push method cannot be used there cause alphabetic sorted keys object!
 
-            additionalPatches[i](parent);
-
-        }
-
-        for (let i = 0; i < reorderPatches.length; i++) {
-
-            reorderPatches[i]();
+            additionalPatches[key](parent);
 
         }
+
+        for (let i = 0; i < reorderPatches.length; i++) { //reorder patches must be last cause layout shift done by additional patches and old node patches (deletions)
+
+            reorderPatches[i](parent);
+
+        }        
 
         return updatedVChildren;
 

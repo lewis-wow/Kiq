@@ -4,6 +4,8 @@
  *  Component class
  */
 
+import errorReport from "../../errorReporting.js";
+
 export default function Component(props) {
 
     this.props = props;
@@ -39,7 +41,7 @@ Component.prototype.Element = function () {
 
 Component.prototype.setState = function() {
 
-    throw Error(`setState(...) can be called only if component is rendered, will be mounted or is mounted`);
+    throw errorReport('setState(...)', `can be called only if component is rendered, will be mounted or is mounted`);
 
 }
 

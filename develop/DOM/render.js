@@ -18,7 +18,7 @@ export default function render(virtualNode) {
      */
     if (isNullOrUndef(virtualNode)) {
 
-        throw Error(`virtual node cannot be null or undefined`);
+        return;
 
     };
 

@@ -26,7 +26,7 @@ export default function diff(vOldNode, vNewNode) {
 
         return function (node) {
 
-            treeWillUnMount(vOldNode.virtualNode);
+            treeWillUnMount(vOldNode);
 
             node.remove();
 

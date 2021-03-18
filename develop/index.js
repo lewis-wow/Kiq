@@ -8,6 +8,7 @@ import createElement from './vnode/createElement.js';
 import Component from './vnode/component/component.js';
 import mount from './DOM/mount.js';
 import render from './DOM/render.js';
+import errorReport from './errorReporting.js';
 
 /**
  * whole library is in container funciton for use library in node.js, js, as modules, ...
@@ -25,11 +26,11 @@ import render from './DOM/render.js';
 
     function renderToPage(virtualElement, container, callback) {
 
-        //window.requestAnimationFrame(() => {
+        window.requestAnimationFrame(() => {
 
             if (!container || container.nodeType !== Node.ELEMENT_NODE) {
 
-                throw TypeError(`render(...) container must be valid Element that is already rendered on page, try to use DOMContentLoaded event on window to wait for all Elements load`);
+                throw errorReport('render(...)', `container must be valid Element that is already rendered on page`);
 
             }
 
@@ -37,7 +38,7 @@ import render from './DOM/render.js';
 
             callback(newNodeDefinition);
 
-        //});
+        });
 
     }
 
@@ -45,11 +46,17 @@ import render from './DOM/render.js';
 
         Component,
 
-        render: function (virtualElement, container) {
+        render: function (virtualElement, container, callback) {
 
             renderToPage(virtualElement, container, newNodeDefinition => {
 
                 mount(newNodeDefinition, container, () => container.appendChild(newNodeDefinition.realDOM));
+
+                if(callback) {
+
+                    callback(newNodeDefinition);
+
+                }
 
             });
 
@@ -57,13 +64,20 @@ import render from './DOM/render.js';
 
         createElement,
 
-        replace: function(virtualElement, container) {
+        replace: function(virtualElement, container, callback) {
 
             renderToPage(virtualElement, container, newNodeDefinition => {
 
                 mount(newNodeDefinition, container, () => container.replaceWith(newNodeDefinition.realDOM));
 
+                if(callback) {
+
+                    callback(newNodeDefinition);
+
+                }
+
             });
+
         }
 
     };

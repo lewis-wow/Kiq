@@ -11,6 +11,8 @@ import isObject from "../isObject.js";
 
 export default function mount(newNodeDefinition, container, mounterFunction) {
 
+    if(newNodeDefinition === undefined) return;
+
     const virtualNode = newNodeDefinition.virtualNode;
 
     if (isObject(virtualNode) && isComponent(virtualNode.type)) {

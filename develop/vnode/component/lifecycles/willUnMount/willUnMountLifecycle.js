@@ -6,6 +6,8 @@
  * @param { any } component (String, Object)
  */
 
+import errorReport from "../../../../errorReporting.js";
+
 export default function componentWillUnMount(component) {
 
     component.onComponentWillUnMount(component._internals.realDOM);
@@ -16,7 +18,7 @@ export default function componentWillUnMount(component) {
 
         const nameOfComponent = component.constructor.name;
 
-        throw Error(`Remove all asynchronnous functions that causes setState(...) of ${ nameOfComponent } in onComponentWillUnMount, else it causes memory leak`);
+        throw errorReport('setState(...)', `Remove all asynchronnous functions that causes setState(...) of ${ nameOfComponent } in onComponentWillUnMount, else it causes memory leak`);
 
     };
 

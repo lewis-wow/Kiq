@@ -2,6 +2,7 @@ import updateComponent from '../../update/updateComponent.js';
 import isFunction from '../../isFunction.js';
 import isObject from '../../isObject.js';
 import applyComponentUpdate from '../../update/applyComponentUpdate.js';
+import errorReport from '../../errorReporting.js';
 
 
 export default function setState(component, setter) {
@@ -20,11 +21,14 @@ export default function setState(component, setter) {
 
     } else {
 
-        throw TypeError(`setState(...) expecting 1 parameter as Function or Object, you give ${ typeof setter }`);
+        throw errorReport('setState(...)', `expecting 1 parameter as Function or Object, you give ${ typeof setter }`);
 
     }
 
     if (Object.keys(newStateFromSetter).length) {
+
+        const wasActiveElement = document.activeElement;
+
         const update = updateComponent(component, null, newStateFromSetter);
         //update component return patch which is function and snapshot that is given from getSnapshotBeforeUpdate
 
@@ -43,10 +47,12 @@ export default function setState(component, setter) {
 
         }, null);
 
+        wasActiveElement.focus();
+
         return component;
 
     }
 
-    throw Error(`setState(...) must be Object or Function that returns Object, if Object is empty or doesn't return nothing, update can be redundant`);
+    throw errorReport('setState(...)', `setState(...) must be Object or Function that returns Object, if Object is empty or doesn't return nothing, update can be redundant`);
 
 }

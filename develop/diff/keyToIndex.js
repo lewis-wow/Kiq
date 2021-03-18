@@ -4,14 +4,15 @@ export default function keyToIndex(arr) {
 
     const keyed = {};
     const free = [];
+    let keysAreUsed = false;
 
     for(let i = 0; i < arr.length; i++) {
 
         const arrItem = arr[i];
-        const key = arrItem._key;
+        const key = arrItem === undefined || arrItem._key === undefined ? null : arrItem._key;
 
-        if(key) {
-
+        if(key !== null) {
+            keysAreUsed = true;
             //if(!(key in keyed)) {
                 
                 keyed[key] = i;
@@ -28,7 +29,8 @@ export default function keyToIndex(arr) {
 
     return [
         keyed,
-        free
+        free,
+        keysAreUsed
     ];
 
 }
