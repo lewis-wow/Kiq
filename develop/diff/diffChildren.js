@@ -189,7 +189,7 @@ export default function diffChildren(oldVChildren, newVChildren) {
 
             reorderPatches[i](parent);
 
-        }        
+        } 
 
         return updatedVChildren;
 

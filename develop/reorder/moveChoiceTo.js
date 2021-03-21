@@ -1,14 +1,6 @@
 
 
-export default function moveChoiceTo(elem, direction, currIndex) {
-
-    const shilfLayout = direction < 0 ? direction + currIndex : direction - currIndex;
-
-    return function(parent) {
-
-        parent.insertBefore(elem, parent.childNodes[shilfLayout]);
-
-    };
+export default function moveChoiceTo(elem, direction) {
 
     if(direction < 0) {
 
