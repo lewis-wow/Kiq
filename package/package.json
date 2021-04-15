@@ -1,6 +1,6 @@
 {
   "name": "kiq",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Blazing fast virtual DOM class component based library for reactive UI",
   "main": "Kiq.min.js",
   "scripts": {
