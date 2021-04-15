@@ -15,7 +15,7 @@ Blazing fast virtual DOM class component based library for reactive UI
 
 
 ```
-<script src="https://cdn.jsdelivr.net/npm/kiq@0.0.5/Kiq.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/kiq@0.0.6/Kiq.min.js"></script>
 ```
 ## Inspiration
 React.js for virtual DOM, components and performance tips    
