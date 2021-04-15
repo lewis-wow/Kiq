@@ -1,3 +1,8 @@
+/*
+    (c) Ludvík Prokopec
+    License: MIT
+    !This version is not recomended for production use
+*/
 
 (function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
@@ -6,6 +11,16 @@
 }(this, function () {
 
     "use strict";
+
+    function errorReport(errName, arrMessage, errType = Error)  {
+
+        const err = new errType(arrMessage);
+    
+        err.name = errName;
+    
+        return err;
+    
+    }
 
     function isArray(array) {
 
@@ -48,12 +63,14 @@
         if("_key" in props) {
     
             _key = props._key.toString();
+            delete props._key;
     
         }
     
         if("_ref" in props) {
     
             _ref = props._ref;
+            delete props._ref;
     
         }
     
@@ -129,7 +146,7 @@
     
     Component.prototype.setState = function() {
     
-        throw Error(`setState(...) can be called only if component is rendered, will be mounted or is mounted`);
+        throw errorReport('setState(...)', `can be called only if component is rendered, will be mounted or is mounted`);
     
     }
     
@@ -178,7 +195,7 @@
         return instance;
     
     }
-
+    
     function createComponentUpdate(component, newStateFromSetter) {
 
         const update = updateComponent(component, null, newStateFromSetter);
@@ -219,11 +236,14 @@
     
         } else {
     
-            throw TypeError(`setState(...) expecting 1 parameter as Function or Object, you give ${ typeof setter }`);
+            throw errorReport('setState(...)', `expecting 1 parameter as Function or Object, you give ${ typeof setter }`);
     
         }
     
         if (Object.keys(newStateFromSetter).length) {
+    
+            const wasActiveElement = document.activeElement;
+    
             const update = updateComponent(component, null, newStateFromSetter);
             //update component return patch which is function and snapshot that is given from getSnapshotBeforeUpdate
     
@@ -242,11 +262,13 @@
     
             }, null);
     
+            wasActiveElement.focus();
+    
             return component;
     
         }
     
-        throw Error(`setState(...) must be Object or Function that returns Object, if Object is empty or doesn't return nothing, update can be redundant`);
+        throw errorReport('setState(...)', `setState(...) must be Object or Function that returns Object, if Object is empty or doesn't return nothing, update can be redundant`);
     
     }
 
@@ -298,7 +320,7 @@
     
             const nameOfComponent = component.constructor.name;
     
-            throw Error(`Remove all asynchronnous functions that causes setState(...) of ${ nameOfComponent } in onComponentWillUnMount, else it causes memory leak`);
+            throw errorReport('setState(...)', `Remove all asynchronnous functions that causes setState(...) of ${ nameOfComponent } in onComponentWillUnMount, else it causes memory leak`);
     
         };
     
@@ -361,6 +383,78 @@
          */
         
          return [diff(oldComponent._internals.virtualNode, newVNode), snapshot];
+    
+    }
+
+    function getChildIndex(node, parent) {
+
+        return Array.prototype.indexOf.call(parent.childNodes, node);
+        
+    }
+
+    function moveChoiceTo(elem, direction) {
+
+        if(direction < 0) {
+    
+            return function(parent) {
+    
+                let i = 0;
+    
+                while(i > direction && elem.previousSibling) {
+    
+                    parent.insertBefore(elem, elem.previousSibling);
+                    i--;
+    
+                }
+    
+            }
+    
+        } else if(direction > 0) {
+    
+            return function(parent) {
+    
+                let i = 0;
+    
+                while(i < direction && elem.nextSibling) {
+    
+                    parent.insertBefore(elem, elem.nextSibling.nextSibling);
+                    i++;
+    
+                }
+    
+            }
+    
+        }
+    
+    }
+
+    function reorderChildren(oldVChildren, newVChildren, keyedOld, keyedNew) {
+
+        const reorderPatches = [];
+    
+        for(const key in keyedOld) {
+    
+            if(key in keyedNew) {
+    
+                const inOldVChildrenIndex = keyedOld[key];
+                const inNewVChildrenIndex = keyedNew[key];
+                const node = oldVChildren[inOldVChildrenIndex].realDOM;
+    
+                reorderPatches.push(function(parent) {
+    
+                    const currIndex = getChildIndex(node, parent); //hydration process
+    
+                    if(currIndex === inNewVChildrenIndex) return; //O(m) Mem & Time, hydrated
+    
+                    moveChoiceTo(node, inNewVChildrenIndex - currIndex)(parent); //O(Max(m)) hydrated, reordered
+    
+                });
+    
+            }
+    
+        }
+    
+        return reorderPatches;
     
     }
 
@@ -455,6 +549,8 @@
 
     function mount(newNodeDefinition, container, mounterFunction) {
 
+        if(newNodeDefinition === undefined) return;
+    
         const virtualNode = newNodeDefinition.virtualNode;
     
         if (isObject(virtualNode) && isComponent(virtualNode.type)) {
@@ -480,7 +576,7 @@
          */
         if (isNullOrUndef(virtualNode)) {
     
-            throw Error(`virtual node cannot be null or undefined`);
+            return;
     
         };
     
@@ -533,9 +629,9 @@
              * means if virtual is not element but component, it become Class.Component from {type, props, _key}
              * we must overwrite the virtal beacause of this
              */
-            component.onComponentRender(newNodeDefinition.realDOM);
-    
             component.setState = (setter) => setState(component, setter);
+    
+            component.onComponentRender(newNodeDefinition.realDOM);
     
             return {
                 virtualNode: component,
@@ -590,7 +686,7 @@
     
             return function (node) {
     
-                treeWillUnMount(vOldNode.virtualNode);
+                treeWillUnMount(vOldNode);
     
                 node.remove();
     
@@ -632,11 +728,7 @@
     
                 const newNodeDefinition = render(vNewNode);
     
-                mount(newNodeDefinition, 
-                    node.parentNode, 
-                    () => { 
-                        node.replaceWith(newNodeDefinition.realDOM);
-                    });
+                mount(newNodeDefinition, node.parentNode, () => node.replaceWith(newNodeDefinition.realDOM));
     
                 return newNodeDefinition;
     
@@ -659,6 +751,7 @@
             return { virtualNode: vOldNode, realDOM: node, _key: vNewNode._key };
     
         }
+        
     };
 
     function diffComponents(oldComponent, newComponent, isVOldNodeComponent, isVNewNodeComponent) {
@@ -805,8 +898,16 @@
     
         const additionalPatches = [];
     
-        const [keyedOld, freeOld] = keyToIndex(oldVChildren);
-        const [keyedNew, freeNew] = keyToIndex(newVChildren);
+        const [keyedOld, freeOld, oldKeysExists] = keyToIndex(oldVChildren);
+        const [keyedNew, freeNew, newKeysExists] = keyToIndex(newVChildren);
+    
+        let reorderPatches = [];
+    
+        if(oldKeysExists && newKeysExists) {
+    
+            reorderPatches = reorderChildren(oldVChildren, newVChildren, keyedOld, keyedNew);
+    
+        }
     
         const maxFreeLen = Math.max(freeNew.length, freeOld.length);
     
@@ -839,11 +940,7 @@
     
                 additionalPatches.push(function (parent) {
     
-                    mount(newNodeDefinition,
-                        parent,
-                        () => {
-                            parent.appendChild(newNodeDefinition.realDOM);
-                        });
+                    mount(newNodeDefinition, parent, () => parent.appendChild(newNodeDefinition.realDOM));
     
                 });
     
@@ -877,60 +974,73 @@
     
         }
     
-        for (const key in keyedOld) {
+        for (const key in keyedNew) {
     
-            const inOldVChildrenIndex = keyedOld[key];
             const inNewVChildrenIndex = keyedNew[key];
-            const vOldNode = oldVChildren[inOldVChildrenIndex];
+            const vNewNode = newVChildren[inNewVChildrenIndex];
     
-            const childPatch = diff(vOldNode.virtualNode, newVChildren[inNewVChildrenIndex]);
+            if (!(key in keyedOld)) {
     
-            if (childPatch) {
+                const newNodeDefinition = render(vNewNode);
+                updatedVChildren[inNewVChildrenIndex] = newNodeDefinition;
     
-                vOldNode.patch = function (node) {
+                additionalPatches[inNewVChildrenIndex] = (function (parent) {
     
-                    const childAfterPatch = childPatch(node);
+                    mount(newNodeDefinition, parent, () => parent.insertBefore(newNodeDefinition.realDOM, parent.childNodes[inNewVChildrenIndex]));
     
-                    if (childAfterPatch !== undefined) {
-    
-                        updatedVChildren[inNewVChildrenIndex] = childAfterPatch;
-    
-                    }
-    
-                };
-    
-                childPatches.push(inOldVChildrenIndex);
+                });
     
             } else {
     
-                updatedVChildren[inNewVChildrenIndex] = vOldNode;
+                const inOldVChildrenIndex = keyedOld[key];
+                const vOldNode = oldVChildren[inOldVChildrenIndex];
+    
+                let childPatch;
+                let keyToDel = key;
+    
+                childPatch = diff(vOldNode.virtualNode, vNewNode);
+    
+                if (childPatch) {
+    
+                    const patchFunction = function (node) {
+    
+                        const childAfterPatch = childPatch(node);
+    
+                        if (childAfterPatch !== undefined) {
+    
+                            updatedVChildren[inNewVChildrenIndex] = childAfterPatch;
+    
+                        }
+    
+                    };
+    
+                    vOldNode.patch = patchFunction;
+                    childPatches.push(inOldVChildrenIndex);
+    
+                } else {
+    
+                    updatedVChildren[inNewVChildrenIndex] = vOldNode;
+    
+                }
+    
+                delete keyedOld[keyToDel];
     
             }
     
-            delete keyedNew[key];
+        }
+    
+        for (const key in keyedOld) {
+    
+            const inOldVChildrenIndex = keyedOld[key];
+            const vOldNode = oldVChildren[inOldVChildrenIndex];
+    
+            vOldNode.patch = diff(vOldNode.virtualNode, undefined);
+    
+            childPatches.push(inOldVChildrenIndex);
     
         }
     
-        for(const key in keyedNew) {
-    
-            const inNewVChildrenIndex = keyedNew[key];
-    
-            const newNodeDefinition = render(newVChildren[inNewVChildrenIndex]);
-            updatedVChildren[inNewVChildrenIndex] = newNodeDefinition;
-    
-            additionalPatches.push(function (parent) {
-    
-                mount(newNodeDefinition, 
-                    parent, 
-                    () => { 
-                        parent.insertBefore(newNodeDefinition.realDOM, parent.childNodes[inNewVChildrenIndex]);
-                    });
-    
-            });
-    
-        }
-    
-        if (additionalPatches.length + childPatches.length === 0) {
+        if (additionalPatches.length + childPatches.length + reorderPatches.length === 0) {
     
             return null;
     
@@ -942,15 +1052,21 @@
     
                 const oldVChild = oldVChildren[childPatches[i]];
     
-                oldVChild.patch(oldVChild.realDOM);
+                oldVChild.patch(oldVChild.realDOM); // patches are hooked
     
             }
     
-            for (let i = 0; i < additionalPatches.length; i++) {
+            for (const key in additionalPatches) { //start on indexes, non keys... push method cannot be used there cause alphabetic sorted keys object!
     
-                additionalPatches[i](parent);
+                additionalPatches[key](parent);
     
             }
+    
+            for (let i = 0; i < reorderPatches.length; i++) { //reorder patches must be last cause layout shift done by additional patches and old node patches (deletions)
+    
+                reorderPatches[i](parent);
+    
+            } 
     
             return updatedVChildren;
     
@@ -1086,6 +1202,7 @@
     
         }
     
+    
         Object.keys(oldProps)
             .filter(isProperty)
             .forEach(key => {
@@ -1131,19 +1248,20 @@
 
         const keyed = {};
         const free = [];
+        let keysAreUsed = false;
     
         for(let i = 0; i < arr.length; i++) {
     
             const arrItem = arr[i];
-            const key = arrItem._key;
+            const key = arrItem === undefined || arrItem._key === undefined ? null : arrItem._key;
     
-            if(key) {
-    
-                if(!(key in keyed)) {
+            if(key !== null) {
+                keysAreUsed = true;
+                //if(!(key in keyed)) {
                     
                     keyed[key] = i;
     
-                }
+                //}
     
             } else {
     
@@ -1155,18 +1273,19 @@
     
         return [
             keyed,
-            free
+            free,
+            keysAreUsed
         ];
     
     }
-    
+
     function renderToPage(virtualElement, container, callback) {
 
         window.requestAnimationFrame(() => {
 
             if (!container || container.nodeType !== Node.ELEMENT_NODE) {
 
-                throw TypeError(`render(...) container must be valid Element that is already rendered on page, try to use DOMContentLoaded event on window to wait for all Elements load`);
+                throw errorReport('render(...)', `container must be valid Element that is already rendered on page`);
 
             }
 
@@ -1190,17 +1309,17 @@
 
                 if(callback) {
 
-                    callback();
+                    callback(newNodeDefinition);
 
                 }
-                
+
             });
 
         },
 
         createElement,
 
-        replace: function(virtualElement, container) {
+        replace: function(virtualElement, container, callback) {
 
             renderToPage(virtualElement, container, newNodeDefinition => {
 
@@ -1208,11 +1327,12 @@
 
                 if(callback) {
 
-                    callback();
+                    callback(newNodeDefinition);
 
                 }
 
             });
+
         }
 
     };

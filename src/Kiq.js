@@ -1,6 +1,11 @@
 
+/*
+    (c) Ludvík Prokopec
+    License: MIT
+    !This version is not recomended for production use
+*/
 (function (global, factory) {
-  function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+    function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }  
   (typeof exports === "undefined" ? "undefined" : _typeof(exports)) === 'object' && typeof module !== 'undefined' ? module.exports = factory(_typeof) : typeof define === 'function' && define.amd ? define(function(){ return factory(_typeof); }) : (global = global || self, global.Kiq = factory(_typeof));
 })(this, function (_typeof) {
   "use strict";
@@ -8,22 +13,29 @@
   function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
 
   function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
-
+  
   function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
-
+  
   function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
-
+  
   function _iterableToArrayLimit(arr, i) { if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return; var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
-
+  
   function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
-
+  
   function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
-
+  
   function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
-
+  
   function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
-
+  
   function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+  
+  function errorReport(errName, arrMessage) {
+    var errType = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : Error;
+    var err = new errType(arrMessage);
+    err.name = errName;
+    return err;
+  }
 
   function isArray(array) {
     return Array.isArray(array);
@@ -54,10 +66,12 @@
 
     if ("_key" in props) {
       _key = props._key.toString();
+      delete props._key;
     }
 
     if ("_ref" in props) {
       _ref = props._ref;
+      delete props._ref;
     }
 
     for (var _len = arguments.length, children = new Array(_len > 2 ? _len - 2 : 0), _key2 = 2; _key2 < _len; _key2++) {
@@ -116,7 +130,7 @@
 
 
   Component.prototype.setState = function () {
-    throw Error("setState(...) can be called only if component is rendered, will be mounted or is mounted");
+    throw errorReport('setState(...)', "can be called only if component is rendered, will be mounted or is mounted");
   };
 
   Component.prototype.onComponentRender = Component.prototype.onComponentWillUpdate = Component.prototype.onComponentUpdate = Component.prototype.onComponentWillMount = Component.prototype.onComponentMount = Component.prototype.onComponentCancelUpdate = Component.prototype.getSnapshotBeforeUpdate = Component.prototype.componentWillGetProps = Component.prototype.onComponentWillUnMount = function () {};
@@ -171,10 +185,11 @@
     } else if (isFunction(setter)) {
       newStateFromSetter = setter.bind(component)(component.props, component.state);
     } else {
-      throw TypeError("setState(...) expecting 1 parameter as Function or Object, you give ".concat(_typeof(setter)));
+      throw errorReport('setState(...)', "expecting 1 parameter as Function or Object, you give ".concat(_typeof(setter)));
     }
 
     if (Object.keys(newStateFromSetter).length) {
+      var wasActiveElement = document.activeElement;
       var update = updateComponent(component, null, newStateFromSetter); //update component return patch which is function and snapshot that is given from getSnapshotBeforeUpdate
 
       applyComponentUpdate(update, function (patch, snapshot) {
@@ -188,10 +203,11 @@
 
         component.onComponentUpdate(snapshot);
       }, null);
+      wasActiveElement.focus();
       return component;
     }
 
-    throw Error("setState(...) must be Object or Function that returns Object, if Object is empty or doesn't return nothing, update can be redundant");
+    throw errorReport('setState(...)', "setState(...) must be Object or Function that returns Object, if Object is empty or doesn't return nothing, update can be redundant");
   }
 
   function getSnapshotBeforeUpdateLifecycle(component) {
@@ -224,7 +240,7 @@
       component.setState = function () {};
 
       var nameOfComponent = component.constructor.name;
-      throw Error("Remove all asynchronnous functions that causes setState(...) of ".concat(nameOfComponent, " in onComponentWillUnMount, else it causes memory leak"));
+      throw errorReport('setState(...)', "Remove all asynchronnous functions that causes setState(...) of ".concat(nameOfComponent, " in onComponentWillUnMount, else it causes memory leak"));
     };
   }
 
@@ -275,6 +291,55 @@
      */
 
     return [diff(oldComponent._internals.virtualNode, newVNode), snapshot];
+  }
+
+  function getChildIndex(node, parent) {
+    return Array.prototype.indexOf.call(parent.childNodes, node);
+  }
+
+  function moveChoiceTo(elem, direction) {
+    if (direction < 0) {
+      return function (parent) {
+        var i = 0;
+
+        while (i > direction && elem.previousSibling) {
+          parent.insertBefore(elem, elem.previousSibling);
+          i--;
+        }
+      };
+    } else if (direction > 0) {
+      return function (parent) {
+        var i = 0;
+
+        while (i < direction && elem.nextSibling) {
+          parent.insertBefore(elem, elem.nextSibling.nextSibling);
+          i++;
+        }
+      };
+    }
+  }
+
+  function reorderChildren(oldVChildren, newVChildren, keyedOld, keyedNew) {
+    var reorderPatches = [];
+
+    for (var key in keyedOld) {
+      if (key in keyedNew) {
+        (function () {
+          var inOldVChildrenIndex = keyedOld[key];
+          var inNewVChildrenIndex = keyedNew[key];
+          var node = oldVChildren[inOldVChildrenIndex].realDOM;
+          reorderPatches.push(function (parent) {
+            var currIndex = getChildIndex(node, parent); //hydration process
+
+            if (currIndex === inNewVChildrenIndex) return; //O(m) Mem & Time, hydrated
+
+            moveChoiceTo(node, inNewVChildrenIndex - currIndex)(parent); //O(Max(m)) hydrated, reordered
+          });
+        })();
+      }
+    }
+
+    return reorderPatches;
   }
 
   function createDomElement(virtualNode) {
@@ -352,6 +417,7 @@
   }
 
   function mount(newNodeDefinition, container, mounterFunction) {
+    if (newNodeDefinition === undefined) return;
     var virtualNode = newNodeDefinition.virtualNode;
 
     if (isObject(virtualNode) && isComponent(virtualNode.type)) {
@@ -369,7 +435,7 @@
      * if virtual dom is undefined return no dom object
      */
     if (isNullOrUndef(virtualNode)) {
-      throw Error("virtual node cannot be null or undefined");
+      return;
     }
 
     ;
@@ -416,12 +482,11 @@
        */
 
 
-      component.onComponentRender(_newNodeDefinition.realDOM);
-
       component.setState = function (setter) {
         return setState(component, setter);
       };
 
+      component.onComponentRender(_newNodeDefinition.realDOM);
       return {
         virtualNode: component,
         realDOM: _newNodeDefinition.realDOM,
@@ -461,7 +526,7 @@
      */
     if (vNewNode === undefined) {
       return function (node) {
-        treeWillUnMount(vOldNode.virtualNode);
+        treeWillUnMount(vOldNode);
         node.remove();
         return undefined;
       };
@@ -493,7 +558,7 @@
       return function (node) {
         var newNodeDefinition = render(vNewNode);
         mount(newNodeDefinition, node.parentNode, function () {
-          node.replaceWith(newNodeDefinition.realDOM);
+          return node.replaceWith(newNodeDefinition.realDOM);
         });
         return newNodeDefinition;
       };
@@ -642,14 +707,22 @@
     var additionalPatches = [];
 
     var _keyToIndex = keyToIndex(oldVChildren),
-        _keyToIndex2 = _slicedToArray(_keyToIndex, 2),
+        _keyToIndex2 = _slicedToArray(_keyToIndex, 3),
         keyedOld = _keyToIndex2[0],
-        freeOld = _keyToIndex2[1];
+        freeOld = _keyToIndex2[1],
+        oldKeysExists = _keyToIndex2[2];
 
     var _keyToIndex3 = keyToIndex(newVChildren),
-        _keyToIndex4 = _slicedToArray(_keyToIndex3, 2),
+        _keyToIndex4 = _slicedToArray(_keyToIndex3, 3),
         keyedNew = _keyToIndex4[0],
-        freeNew = _keyToIndex4[1];
+        freeNew = _keyToIndex4[1],
+        newKeysExists = _keyToIndex4[2];
+
+    var reorderPatches = [];
+
+    if (oldKeysExists && newKeysExists) {
+      reorderPatches = reorderChildren(oldVChildren, newVChildren, keyedOld, keyedNew);
+    }
 
     var maxFreeLen = Math.max(freeNew.length, freeOld.length);
 
@@ -671,7 +744,7 @@
         updatedVChildren[i] = newNodeDefinition;
         additionalPatches.push(function (parent) {
           mount(newNodeDefinition, parent, function () {
-            parent.appendChild(newNodeDefinition.realDOM);
+            return parent.appendChild(newNodeDefinition.realDOM);
           });
         });
       } else {
@@ -698,59 +771,73 @@
     }
 
     var _loop4 = function _loop4(key) {
-      var inOldVChildrenIndex = keyedOld[key];
       var inNewVChildrenIndex = keyedNew[key];
-      var vOldNode = oldVChildren[inOldVChildrenIndex];
-      var childPatch = diff(vOldNode.virtualNode, newVChildren[inNewVChildrenIndex]);
+      var vNewNode = newVChildren[inNewVChildrenIndex];
 
-      if (childPatch) {
-        vOldNode.patch = function (node) {
-          var childAfterPatch = childPatch(node);
+      if (!(key in keyedOld)) {
+        var newNodeDefinition = render(vNewNode);
+        updatedVChildren[inNewVChildrenIndex] = newNodeDefinition;
 
-          if (childAfterPatch !== undefined) {
-            updatedVChildren[inNewVChildrenIndex] = childAfterPatch;
-          }
+        additionalPatches[inNewVChildrenIndex] = function (parent) {
+          mount(newNodeDefinition, parent, function () {
+            return parent.insertBefore(newNodeDefinition.realDOM, parent.childNodes[inNewVChildrenIndex]);
+          });
         };
-
-        childPatches.push(inOldVChildrenIndex);
       } else {
-        updatedVChildren[inNewVChildrenIndex] = vOldNode;
-      }
+        var _inOldVChildrenIndex = keyedOld[key];
+        var _vOldNode = oldVChildren[_inOldVChildrenIndex];
+        var childPatch;
+        var keyToDel = key;
+        childPatch = diff(_vOldNode.virtualNode, vNewNode);
 
-      delete keyedNew[key];
+        if (childPatch) {
+          var patchFunction = function patchFunction(node) {
+            var childAfterPatch = childPatch(node);
+
+            if (childAfterPatch !== undefined) {
+              updatedVChildren[inNewVChildrenIndex] = childAfterPatch;
+            }
+          };
+
+          _vOldNode.patch = patchFunction;
+          childPatches.push(_inOldVChildrenIndex);
+        } else {
+          updatedVChildren[inNewVChildrenIndex] = _vOldNode;
+        }
+
+        delete keyedOld[keyToDel];
+      }
     };
 
-    for (var key in keyedOld) {
+    for (var key in keyedNew) {
       _loop4(key);
     }
 
-    var _loop5 = function _loop5(_key3) {
-      var inNewVChildrenIndex = keyedNew[_key3];
-      var newNodeDefinition = render(newVChildren[inNewVChildrenIndex]);
-      updatedVChildren[inNewVChildrenIndex] = newNodeDefinition;
-      additionalPatches.push(function (parent) {
-        mount(newNodeDefinition, parent, function () {
-          parent.insertBefore(newNodeDefinition.realDOM, parent.childNodes[inNewVChildrenIndex]);
-        });
-      });
-    };
-
-    for (var _key3 in keyedNew) {
-      _loop5(_key3);
+    for (var _key3 in keyedOld) {
+      var inOldVChildrenIndex = keyedOld[_key3];
+      var vOldNode = oldVChildren[inOldVChildrenIndex];
+      vOldNode.patch = diff(vOldNode.virtualNode, undefined);
+      childPatches.push(inOldVChildrenIndex);
     }
 
-    if (additionalPatches.length + childPatches.length === 0) {
+    if (additionalPatches.length + childPatches.length + reorderPatches.length === 0) {
       return null;
     }
 
     return function (parent) {
       for (var _i2 = 0; _i2 < childPatches.length; _i2++) {
         var oldVChild = oldVChildren[childPatches[_i2]];
-        oldVChild.patch(oldVChild.realDOM);
+        oldVChild.patch(oldVChild.realDOM); // patches are hooked
       }
 
-      for (var _i3 = 0; _i3 < additionalPatches.length; _i3++) {
-        additionalPatches[_i3](parent);
+      for (var _key4 in additionalPatches) {
+        //start on indexes, non keys... push method cannot be used there cause alphabetic sorted keys object!
+        additionalPatches[_key4](parent);
+      }
+
+      for (var _i3 = 0; _i3 < reorderPatches.length; _i3++) {
+        //reorder patches must be last cause layout shift done by additional patches and old node patches (deletions)
+        reorderPatches[_i3](parent);
       }
 
       return updatedVChildren;
@@ -863,27 +950,28 @@
   function keyToIndex(arr) {
     var keyed = {};
     var free = [];
+    var keysAreUsed = false;
 
     for (var i = 0; i < arr.length; i++) {
       var arrItem = arr[i];
-      var key = arrItem._key;
+      var key = arrItem === undefined || arrItem._key === undefined ? null : arrItem._key;
 
-      if (key) {
-        if (!(key in keyed)) {
-          keyed[key] = i;
-        }
+      if (key !== null) {
+        keysAreUsed = true; //if(!(key in keyed)) {
+
+        keyed[key] = i; //}
       } else {
         free.push(i);
       }
     }
 
-    return [keyed, free];
+    return [keyed, free, keysAreUsed];
   }
 
   function renderToPage(virtualElement, container, callback) {
     window.requestAnimationFrame(function () {
       if (!container || container.nodeType !== Node.ELEMENT_NODE) {
-        throw TypeError("render(...) container must be valid Element that is already rendered on page, try to use DOMContentLoaded event on window to wait for all Elements load");
+        throw errorReport('render(...)', "container must be valid Element that is already rendered on page");
       }
 
       var newNodeDefinition = render(virtualElement);
@@ -895,30 +983,24 @@
     Component: Component,
     render: function render(virtualElement, container, callback) {
       renderToPage(virtualElement, container, function (newNodeDefinition) {
-
-        var node = newNodeDefinition.realDOM;
-
         mount(newNodeDefinition, container, function () {
-          return container.appendChild(node);
+          return container.appendChild(newNodeDefinition.realDOM);
         });
 
         if (callback) {
-          callback(node);
+          callback(newNodeDefinition);
         }
       });
     },
     createElement: createElement,
     replace: function replace(virtualElement, container, callback) {
       renderToPage(virtualElement, container, function (newNodeDefinition) {
-
-        var node = newNodeDefinition.realDOM;
-
         mount(newNodeDefinition, container, function () {
-          return container.replaceWith(node);
+          return container.replaceWith(newNodeDefinition.realDOM);
         });
 
         if (callback) {
-          callback(node);
+          callback(newNodeDefinition);
         }
       });
     }
