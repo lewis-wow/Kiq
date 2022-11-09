@@ -16,11 +16,11 @@ export default function reorderChildren(oldVChildren, newVChildren, keyedOld, ke
 
             reorderPatches.push(function(parent) {
 
-                const currIndex = getChildIndex(node, parent); //hydration process
+                const currIndex = getChildIndex(node, parent);
 
-                if(currIndex === inNewVChildrenIndex) return; //O(m) Mem & Time, hydrated
+                if(currIndex === inNewVChildrenIndex) return;
 
-                moveChoiceTo(node, inNewVChildrenIndex - currIndex)(parent); //O(Max(m)) hydrated, reordered
+                moveChoiceTo(node, inNewVChildrenIndex - currIndex)(parent);
 
             });
 
