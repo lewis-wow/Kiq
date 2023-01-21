@@ -10,26 +10,6 @@ Jason Yu that creates simple virtual DOM library in about 50 minutes
 ## Goal
 
 Goal is to create very simple, lightweight and very fast virtual DOM library with smart diff algorithm and performance optimalizations.
-Row component:
-
-```js
-/** @jsx Kiq.createElement */
-
-class Row extends Kiq.Component {
-  Element() {
-    const data = this.props.data;
-
-    return (
-      <tr>
-        <td className="first">{data.id}</td>
-        <td className="second">
-          <a>{data.label}</a>
-        </td>
-      </tr>
-    )
-  }
-}
-```
 
 ## Optimalizations
 
