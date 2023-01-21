@@ -225,7 +225,7 @@ class List extends Kiq.Component {
   Element() {
     return (
       <ul>
-        {this.state.arr.map((item) => <li _key={item}>{item}</li>)}
+        {this.state.arr.map((item) => <li key={item}>{item}</li>)}
       </ul>
     )
   }
