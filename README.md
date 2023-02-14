@@ -4,8 +4,7 @@ Blazing fast virtual DOM class component based library for reactive UI
 
 ## Inspiration
 
-React.js for virtual DOM, components and performance tips
-Jason Yu that creates simple virtual DOM library in about 50 minutes
+React.js, Jason Yu that creates simple virtual DOM library in about 50 minutes
 
 ## Goal
 
@@ -13,24 +12,31 @@ Goal is to create very simple, lightweight and very fast virtual DOM library wit
 
 ## Optimalizations
 
-It is optimized by requestAnimationFrame so when there are DOM changes, browser is ready to reflow and repaint, bundling DOM changes into one bundle and do it in one time, so browser don't reflow and repaint every time, small size and simple data control.
+First render is called with requestAnimationFrame, so the main thread is no blocked and components will render when browser is ready to reflow and repaint the page.
+
+Every changes are called as one big bundle of changes in one time, so browser don't reflow and repaint every time for every small change in DOM but 1 repaint and reflow for one state change.
 
 ## Components
 
-Components are javascript classes.
+Components are javascript classes with special methods.
 
-## htm.js
+## createElement
 
-If you want you can use htm.js library for better virtual nodes syntax.
-htm.js transform classic functional syntax to literal string tagged template function.
+There are many posibilities how to create a virtual element. Some of them are with cleaner syntax.
 
-### using vanilla js
+## Virtual element
+
+Virtual element is plain javascript object.
+
+### vanilla js
 
 ```js
 Kiq.createElement('div', { className: 'test' }, count)
 ```
 
-### using htm.js
+### htm.js
+
+htm is library that transforms template literals to virtual element.
 
 ```js
 const html = htm.bind(Kiq.createElement);
@@ -38,7 +44,11 @@ const html = htm.bind(Kiq.createElement);
 html`<div className="test">${count}</div>`
 ```
 
-### using jsx with babel
+### babel jsx
+
+jsx is Javascript XML, babel can compile the jsx code to `createElement` functions.
+The code must start with jsx pragma.
+It provides HTML-like syntax.
 
 ```js
 /** @jsx Kiq.createElement */
@@ -46,24 +56,15 @@ html`<div className="test">${count}</div>`
 <div className="test">{count}</div>
 ```
 
-## createElement
+### create components
 
-This function is most-used function in Kiq.js, it produces virtual nodes (plain javascript objects).
-It can be replaced with htm.js or jsx, but both only transform function syntax to html-like syntax, but htm still trigger createElement function and jsx babel transpiler, transpile html-like syntax to createElement functions.
-
-```js
-Kiq.createElement('div', null, 'Hello, world');
-```
-
-### create components in createElement
-
-Produce components is the same as virtual nodes, but the first parameter replace tag name with your component.
+Produce components is the same as virtual nodes, but the first parameter replace tag name with your component class.
 Attributes are props and children are ```props.children```.
 
 ### props.children
 
 In the component props can be passed as children too.
-Your children are then in props.children Array.
+Your children are then in props.children array.
 
 ```js
 <Parent>
@@ -73,16 +74,16 @@ Your children are then in props.children Array.
 
 ```js
 Kiq.createElement(Parent, null, 
-  Kiq.createElement(Child);
+  Kiq.createElement(Child)
 );
 ```
 
-The Parent component has now access to special ```props.children``` Array where on the first index is Child component.
+The Parent component has now access to special ```props.children``` Array where on the first index is `Child` component.
 
 ## render
 
-This function should be called only once in the app.
-It render your app and produce real DOM objects and mount them to your page.
+This function should be called only once in the whole app.
+It renders your app and produce real DOM objects and mount them to your page.
 
 ```js
 Kiq.render(Kiq.createElement(App), document.getElementById('app'));
@@ -106,33 +107,9 @@ class Counter extends Kiq.Component {
 }
 ```
 
-## Components in ES5
+## Kiq in ES5
 
-If you want to your code is compatible with IE11 and other ES5 browsers you can use ES5 syntax or use babel.js transpiler.
-
-```js
-function Counter() {
-  Kiq.Component.call(this);
-
-  this.state = {
-    count: 0,
-  };
-
-  this.Element = function () {
-    return Kiq.createElement(
-      "button",
-      {
-        onclick: function () {
-          this.setState({ count: this.state.count + 1 });
-        }.bind(this),
-      },
-      this.state.count
-    );
-  };
-}
-
-Counter.prototype = Kiq.Component.prototype;
-```
+If you want to your code is compatible with IE11 and other ES5 browsers you can use some javascript bundler to compile the code down to ES5.
 
 ## state and props
 
@@ -154,7 +131,7 @@ setState is synchronnous function.
 No. There is no way to set props, because it is anti-pattern.
 Props should be read-only.
 
-### How to setState of parent component inside child component? 
+### How to setState of parent component inside child component?
 
 It is simple, you have to pass the "setter" function to the props of child component like this:
 
