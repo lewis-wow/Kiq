@@ -4,12 +4,12 @@ import { VirtualTextNode, VirtualElementNode, VirtualComponentNode } from '../ty
 import { mount } from './mount'
 import { VirtualElement } from '../vnode/createElement'
 
-function render(node: null): null
-function render(node: string | number): VirtualTextNode
-function render(node: VirtualElement<string>): VirtualElementNode
-function render(node: VirtualElement<typeof Component>): VirtualComponentNode
-function render(node: string | number | VirtualElement | null): VirtualTextNode | VirtualElementNode | VirtualComponentNode | null
-function render(node: unknown): VirtualComponentNode | VirtualElementNode | VirtualTextNode | null {
+export function render(node: null): null
+export function render(node: string | number): VirtualTextNode
+export function render(node: VirtualElement<string>): VirtualElementNode
+export function render(node: VirtualElement<typeof Component>): VirtualComponentNode
+export function render(node: string | number | VirtualElement | null): VirtualTextNode | VirtualElementNode | VirtualComponentNode | null
+export function render(node: unknown): VirtualComponentNode | VirtualElementNode | VirtualTextNode | null {
 	if (isNullish(node)) return null
 
 	if (typeof node === 'string' || typeof node === 'number') {
@@ -75,5 +75,3 @@ function render(node: unknown): VirtualComponentNode | VirtualElementNode | Virt
 		$$type: 'element',
 	}
 }
-
-export default render

@@ -1,7 +1,7 @@
 import { mount } from '../DOM/mount'
 import { diff } from './diff'
 import { diffReorderChildren } from './diffReorderChildren'
-import render from '../DOM/render'
+import { render } from '../DOM/render'
 import { VirtualFragmentNode, VirtualNode, VirtualElementNode, VirtualTextNode, VirtualComponentNode } from '../types'
 import { isNullish, isObject } from '../utils'
 
@@ -27,7 +27,9 @@ function keyToIndex(children: VirtualFragmentNode | VirtualNode[]) {
 	return { keyed, free }
 }
 
-export const diffChildren = (oldChildren: VirtualFragmentNode, newChildren: VirtualNode[]): ((node: HTMLElement) => VirtualFragmentNode) => {
+export type ChildrenPatch = (node: HTMLElement) => VirtualFragmentNode
+
+export const diffChildren = (oldChildren: VirtualFragmentNode, newChildren: VirtualNode[]): ChildrenPatch => {
 	const childPatches: (() => void)[] = []
 	const additionalPatches: ((node: HTMLElement) => void)[] = []
 	const updatedChildren: VirtualFragmentNode = [...oldChildren]

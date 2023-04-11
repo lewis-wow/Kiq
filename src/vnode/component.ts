@@ -1,4 +1,4 @@
-import render from '../DOM/render'
+import { render } from '../DOM/render'
 import { isFunction, isObject } from '../utils'
 import { VirtualTextNode, VirtualElementNode, VirtualComponentNode } from '../types'
 import { VirtualElement } from './createElement'

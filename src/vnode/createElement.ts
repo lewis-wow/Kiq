@@ -9,9 +9,13 @@ export interface VirtualElement<T extends string | typeof Component = string | t
 	ref?: ((node: HTMLElement) => void) | null
 }
 
-function createElement(type: string, props?: Record<string, any> | null, ...children: (string | number | VirtualElement | null)[]): VirtualElement<string>
-function createElement(type: typeof Component, props?: Record<string, any> | null, ...children: (string | number | VirtualElement | null)[]): VirtualElement<typeof Component>
-function createElement(type: unknown, props: Record<string, any> | null = null, ...children: (string | number | VirtualElement | null)[]): VirtualElement {
+export function createElement(type: string, props?: Record<string, any> | null, ...children: (string | number | VirtualElement | null)[]): VirtualElement<string>
+export function createElement(
+	type: typeof Component,
+	props?: Record<string, any> | null,
+	...children: (string | number | VirtualElement | null)[]
+): VirtualElement<typeof Component>
+export function createElement(type: unknown, props: Record<string, any> | null = null, ...children: (string | number | VirtualElement | null)[]): VirtualElement {
 	if (isNullish(props)) props = {}
 
 	const key = props?.key ?? null
@@ -40,5 +44,3 @@ function createElement(type: unknown, props: Record<string, any> | null = null, 
 		ref,
 	}
 }
-
-export default createElement

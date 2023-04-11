@@ -1,9 +1,9 @@
 import { VirtualTextNode, VirtualComponentNode, VirtualElementNode } from '../types'
 import { isFunction, isNullish } from '../utils'
 
-function mount(virtualNode: VirtualTextNode | VirtualComponentNode | VirtualElementNode | null, op: HTMLElement | Text): HTMLElement | Text | null
-function mount(virtualNode: VirtualTextNode | VirtualComponentNode | VirtualElementNode | null, op: (node: HTMLElement | Text) => void): HTMLElement | Text | null
-function mount(
+export function mount(virtualNode: VirtualTextNode | VirtualComponentNode | VirtualElementNode | null, op: HTMLElement | Text): HTMLElement | Text | null
+export function mount(virtualNode: VirtualTextNode | VirtualComponentNode | VirtualElementNode | null, op: (node: HTMLElement | Text) => void): HTMLElement | Text | null
+export function mount(
 	virtualNode: VirtualTextNode | VirtualComponentNode | VirtualElementNode | null,
 	op: HTMLElement | Text | ((node: HTMLElement | Text) => void),
 ): HTMLElement | Text | null {
@@ -18,7 +18,7 @@ function mount(
 	return virtualNode.dom
 }
 
-function unmountRec(virtualNode: VirtualTextNode | VirtualElementNode | VirtualComponentNode) {
+const unmountRec = (virtualNode: VirtualTextNode | VirtualElementNode | VirtualComponentNode) => {
 	if (virtualNode.$$type === 'text') return
 
 	if (virtualNode.$$type === 'component') {
@@ -31,10 +31,8 @@ function unmountRec(virtualNode: VirtualTextNode | VirtualElementNode | VirtualC
 	}
 }
 
-function unmount(virtualNode: VirtualTextNode | VirtualElementNode | VirtualComponentNode | null) {
+export const unmount = (virtualNode: VirtualTextNode | VirtualElementNode | VirtualComponentNode | null) => {
 	if (isNullish(virtualNode)) return
 
 	unmountRec(virtualNode)
 }
-
-export { mount, unmount }

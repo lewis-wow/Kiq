@@ -1,12 +1,12 @@
 import { diffChildren } from './diffChildren'
 import { diffProps } from './diffProps'
-import render from '../DOM/render'
+import { render } from '../DOM/render'
 import { isFunction } from '../utils'
 import { VirtualTextNode, VirtualElementNode, VirtualComponentNode, VirtualNode, Patch } from '../types'
 import { mount, unmount } from '../DOM/mount'
-import diffComponents from './diffComponents'
+import { diffComponents } from './diffComponents'
 
-function diff(oldNode: VirtualTextNode | VirtualElementNode | VirtualComponentNode, newNode: VirtualNode): Patch {
+export const diff = (oldNode: VirtualTextNode | VirtualElementNode | VirtualComponentNode, newNode: VirtualNode): Patch => {
 	if (newNode === null) {
 		return () => {
 			unmount(oldNode)
@@ -70,5 +70,3 @@ function diff(oldNode: VirtualTextNode | VirtualElementNode | VirtualComponentNo
 		}
 	}
 }
-
-export { diff }

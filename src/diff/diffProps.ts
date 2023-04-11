@@ -1,7 +1,9 @@
 import { getEventName, isEvent } from '../DOM/helpers'
 import { isObject } from '../utils'
 
-export const diffProps = (oldProps: Record<string, any>, newProps: Record<string, any>): ((node: HTMLElement | Text) => Record<string, any>) => {
+export type PropsPatch = (node: HTMLElement | Text) => Record<string, any>
+
+export const diffProps = (oldProps: Record<string, any>, newProps: Record<string, any>): PropsPatch => {
 	const propsPatches: ((node: HTMLElement | Text) => void)[] = []
 	const updatedProps: Record<string, any> = oldProps
 

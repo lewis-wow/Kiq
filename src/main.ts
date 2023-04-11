@@ -1,7 +1,7 @@
 import { mount } from './DOM/mount'
 import Component from './vnode/component'
-import renderDOM from './DOM/render'
-import createElement, { VirtualElement } from './vnode/createElement'
+import { render as renderDOM } from './DOM/render'
+import { VirtualElement, createElement } from './vnode/createElement'
 
 const render = (vnode: VirtualElement, container: HTMLElement, callback?: (node: HTMLElement) => void) => {
 	window.requestAnimationFrame(() => {
@@ -21,4 +21,3 @@ const replace = (vnode: VirtualElement, container: HTMLElement, callback?: (node
 
 export { Component, render, replace, createElement }
 export default { Component, render, replace, createElement }
-

@@ -4,10 +4,12 @@ import Component, { ComponentWrapper } from '../vnode/component'
 import { isFunction } from '../utils'
 import { diff } from './diff'
 
-function diffComponents(oldComponent: VirtualComponentNode, newComponent: VirtualElement<string>): () => VirtualElementNode
-function diffComponents(oldComponent: VirtualComponentNode, newComponent: VirtualElement<typeof Component>): () => VirtualComponentNode
-function diffComponents(oldComponent: VirtualElementNode, newComponent: VirtualElement<typeof Component>): () => VirtualComponentNode
-function diffComponents(oldComponent: VirtualComponentNode | VirtualElementNode, newComponent: VirtualElement) {
+export type ComponentPatch = () => VirtualComponentNode
+
+export function diffComponents(oldComponent: VirtualComponentNode, newComponent: VirtualElement<string>): ComponentPatch
+export function diffComponents(oldComponent: VirtualComponentNode, newComponent: VirtualElement<typeof Component>): ComponentPatch
+export function diffComponents(oldComponent: VirtualElementNode, newComponent: VirtualElement<typeof Component>): ComponentPatch
+export function diffComponents(oldComponent: VirtualComponentNode | VirtualElementNode, newComponent: VirtualElement) {
 	if (oldComponent.$$type === 'component') {
 		if (isFunction(newComponent.type)) {
 			if (oldComponent.node.component.type === newComponent.type) {
@@ -39,5 +41,3 @@ function diffComponents(oldComponent: VirtualComponentNode | VirtualElementNode,
 		}
 	}
 }
-
-export default diffComponents
