@@ -3,13 +3,16 @@ import { diffProps } from './diffProps'
 import { render } from '../DOM/render'
 import { isFunction } from '../utils'
 import { VirtualTextNode, VirtualElementNode, VirtualComponentNode, VirtualNode, Patch } from '../types'
-import { mount, unmount } from '../DOM/mount'
+import { mount } from '../DOM/mount'
 import { diffComponents } from './diffComponents'
 
 export const diff = (oldNode: VirtualTextNode | VirtualElementNode | VirtualComponentNode, newNode: VirtualNode): Patch => {
 	if (newNode === null) {
 		return () => {
-			unmount(oldNode)
+			if (oldNode.$$type === 'component') {
+				oldNode.node.destroy()
+			}
+
 			oldNode?.dom?.remove()
 			return null
 		}

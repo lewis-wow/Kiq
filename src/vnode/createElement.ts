@@ -1,31 +1,32 @@
-import Component from './component'
-import { isNullish } from '../utils'
+import { FunctionalComponent } from './component'
+import { Props, VirtualChildren } from '../types'
+import { isFunctionalComponent } from '../utils/isFunctionalComponent'
 
-export interface VirtualElement<T extends string | typeof Component = string | typeof Component> {
-	type: T
-	props: Record<string, any>
-	children: (string | number | VirtualElement | null)[]
+export type VirtualElement<TType extends string | FunctionalComponent = string | FunctionalComponent> = {
+	type: TType
+	props: Props
+	children: VirtualChildren
 	key?: string | number | null
 	ref?: ((node: HTMLElement) => void) | null
 }
 
-export function createElement(type: string, props?: Record<string, any> | null, ...children: (string | number | VirtualElement | null)[]): VirtualElement<string>
-export function createElement(
-	type: typeof Component,
-	props?: Record<string, any> | null,
-	...children: (string | number | VirtualElement | null)[]
-): VirtualElement<typeof Component>
-export function createElement(type: unknown, props: Record<string, any> | null = null, ...children: (string | number | VirtualElement | null)[]): VirtualElement {
-	if (isNullish(props)) props = {}
+type CreateElement = {
+	(type: string, props?: Props | null, ...children: VirtualChildren): VirtualElement<string>
+	<TProps extends Record<string, any>>(type: FunctionalComponent, props?: Props<TProps> | null, ...children: VirtualChildren): VirtualElement<FunctionalComponent>
+}
 
+export const createElement: CreateElement = <TProps extends Record<string, any>>(
+	type: string | FunctionalComponent,
+	props?: Props<TProps> | null,
+	...children: VirtualChildren
+) => {
 	const key = props?.key ?? null
-	'key' in props && delete props.key
 
-	if (typeof type === 'function') {
-		if ('ref' in props) throw TypeError('ref is not supported on components')
+	if (isFunctionalComponent(type)) {
+		if (props && 'ref' in props) throw new Error('ref is not supported on components')
 
 		return {
-			type: type as typeof Component,
+			type,
 			props,
 			children,
 			key,
@@ -34,10 +35,9 @@ export function createElement(type: unknown, props: Record<string, any> | null =
 	}
 
 	const ref = props?.ref ?? null
-	'ref' in props && delete props.ref
 
 	return {
-		type: type as string,
+		type,
 		props,
 		children,
 		key,

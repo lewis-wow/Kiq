@@ -1,15 +1,16 @@
-import Component, { ComponentWrapper } from '../vnode/component'
-import { isNullish, isObject, isFunction } from '../utils'
-import { VirtualTextNode, VirtualElementNode, VirtualComponentNode } from '../types'
+import { Component, FunctionalComponent } from '../vnode/component'
+import { isNullish, isObject } from '../utils'
+import { VirtualTextNode, VirtualElementNode, VirtualComponentNode, Props } from '../types'
 import { mount } from './mount'
 import { VirtualElement } from '../vnode/createElement'
+import { isFunctionalComponent } from '../utils/isFunctionalComponent'
 
 export function render(node: null): null
 export function render(node: string | number): VirtualTextNode
 export function render(node: VirtualElement<string>): VirtualElementNode
-export function render(node: VirtualElement<typeof Component>): VirtualComponentNode
+export function render(node: VirtualElement<FunctionalComponent>): VirtualComponentNode
 export function render(node: string | number | VirtualElement | null): VirtualTextNode | VirtualElementNode | VirtualComponentNode | null
-export function render(node: unknown): VirtualComponentNode | VirtualElementNode | VirtualTextNode | null {
+export function render(node: string | number | VirtualElement | null): VirtualTextNode | VirtualElementNode | VirtualComponentNode | null {
 	if (isNullish(node)) return null
 
 	if (typeof node === 'string' || typeof node === 'number') {
@@ -20,20 +21,20 @@ export function render(node: unknown): VirtualComponentNode | VirtualElementNode
 		}
 	}
 
-	if (isFunction((node as VirtualElement).type)) {
-		// @ts-ignore
-		const component = new ComponentWrapper(new (node.type as Component)({ ...node.props, children: node.children }))
-		const rendered = component.render()
+	if (isFunctionalComponent(node.type)) {
+		const component = new Component<Props>(node.type)
+		component.render(node.props)
 
 		return {
-			...rendered,
-			key: (node as VirtualElement).key,
+			$$type: 'component',
+			node: component,
+			key: node.key,
 		}
 	}
 
-	const element = document.createElement((node as VirtualElement).type as string)
+	const element = document.createElement(node.type)
 
-	Object.keys((node as VirtualElement).props).forEach((key) => {
+	Object.keys(node.props).forEach((key) => {
 		if (key.startsWith('on')) {
 			return element.addEventListener(key.replace('on', ''), (node as VirtualElement).props[key])
 		}
@@ -49,7 +50,7 @@ export function render(node: unknown): VirtualComponentNode | VirtualElementNode
 
 	const renderedChildren: (VirtualComponentNode | VirtualElementNode | VirtualTextNode)[] = []
 
-	;(node as VirtualElement).children.forEach((child) => {
+	node.children.forEach((child) => {
 		const renderResult = render(child)
 
 		if (renderResult) {
@@ -64,14 +65,14 @@ export function render(node: unknown): VirtualComponentNode | VirtualElementNode
 	ref?.(element)
 
 	return {
+		$$type: 'element',
 		dom: element,
 		node: {
-			type: (node as VirtualElement<string>).type,
-			props: (node as VirtualElement<string>).props,
+			type: node.type,
+			props: node.props,
 			children: renderedChildren,
 		},
 		key,
 		ref,
-		$$type: 'element',
 	}
 }
