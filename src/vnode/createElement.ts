@@ -1,46 +1,45 @@
 import { FunctionalComponent } from './component'
-import { Props, VirtualChildren } from '../types'
+import { InputProps, VirtualChildren } from '../types'
 import { isFunctionalComponent } from '../utils/isFunctionalComponent'
 
-export type VirtualElement<TType extends string | FunctionalComponent = string | FunctionalComponent> = {
+export type VirtualElement<TType extends keyof HTMLElementTagNameMap | FunctionalComponent = keyof HTMLElementTagNameMap | FunctionalComponent> = {
 	type: TType
-	props: Props
-	children: VirtualChildren
+	props: InputProps<TType> & {
+		children: VirtualChildren
+	}
 	key?: string | number | null
-	ref?: ((node: HTMLElement) => void) | null
+	ref?: TType extends keyof HTMLElementTagNameMap ? ((node: HTMLElement) => void) | null : null
 }
 
-type CreateElement = {
-	(type: string, props?: Props | null, ...children: VirtualChildren): VirtualElement<string>
-	<TProps extends Record<string, any>>(type: FunctionalComponent, props?: Props<TProps> | null, ...children: VirtualChildren): VirtualElement<FunctionalComponent>
-}
-
-export const createElement: CreateElement = <TProps extends Record<string, any>>(
-	type: string | FunctionalComponent,
-	props?: Props<TProps> | null,
+export function createElement<TType extends keyof HTMLElementTagNameMap>(type: TType, props?: InputProps<TType> | null, ...children: VirtualChildren): VirtualElement<TType>
+export function createElement<TType extends FunctionalComponent, TProps extends Record<string, any>>(
+	type: FunctionalComponent<TProps>,
+	props?: InputProps<TType, TProps> | null,
 	...children: VirtualChildren
-) => {
-	const key = props?.key ?? null
+): VirtualElement<FunctionalComponent>
+
+export function createElement<TType extends keyof HTMLElementTagNameMap | FunctionalComponent, TProps extends Record<string, any>>(
+	type: TType,
+	props?: InputProps<TType, TProps> | null,
+	...children: VirtualChildren
+): VirtualElement<TType> {
+	const { key, ref, ..._props } = props ?? {}
 
 	if (isFunctionalComponent(type)) {
 		if (props && 'ref' in props) throw new Error('ref is not supported on components')
 
 		return {
 			type,
-			props,
-			children,
+			props: { ..._props, children },
 			key,
-			ref: null,
+			ref: undefined,
 		}
 	}
 
-	const ref = props?.ref ?? null
-
 	return {
 		type,
-		props,
-		children,
+		props: { ..._props, children },
 		key,
 		ref,
-	}
+	} as VirtualElement<typeof type>
 }

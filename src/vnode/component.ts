@@ -2,7 +2,7 @@ import { render } from '../DOM/render'
 import { VirtualComponentNode, VirtualElementNode, VirtualNode, VirtualTextNode } from '../types'
 
 export class Component<TProps extends object = any> {
-	dom: VirtualTextNode | VirtualElementNode | VirtualComponentNode | null = null
+	rendered: VirtualTextNode | VirtualElementNode | VirtualComponentNode | null = null
 	hooks: any[] = []
 	destroymentCallbacks: (() => void)[] = []
 	currentHookIndex = 0
@@ -12,7 +12,7 @@ export class Component<TProps extends object = any> {
 	render(props: TProps) {
 		const functionalComponentVirualNode = this.functionalComponent(props)
 		this.currentHookIndex = 0 // reset for next rerender
-		this.dom = render(functionalComponentVirualNode)
+		this.rendered = render(functionalComponentVirualNode)
 
 		return this
 	}
@@ -28,4 +28,4 @@ export class Component<TProps extends object = any> {
 	}
 }
 
-export type FunctionalComponent<TProps extends object = any> = (props: TProps) => VirtualNode
+export type FunctionalComponent<TProps extends Record<string, any> = Record<string, any>> = (props: TProps) => VirtualNode

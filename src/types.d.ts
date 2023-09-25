@@ -8,9 +8,9 @@ export type VirtualFragmentNode = (VirtualTextNode | VirtualElementNode | Virtua
 
 export type VirtualChildren = (string | number | VirtualElement | null)[]
 
-export type Props<TProps extends Record<string, any> = Record<string, any>> = {
+export type InputProps<TType extends keyof HTMLElementTagNameMap | FunctionalComponent, TProps extends Record<string, any> = Record<string, any>> = {
 	key?: string | number
-	ref?: ((node: HTMLElement) => void) | null
+	ref?: TType extends keyof HTMLElementTagNameMap ? (node: HTMLElementTagNameMap[TType]) => void : undefined
 } & Omit<TProps, 'key' | 'ref'>
 
 export type VirtualTextNode = {
@@ -23,8 +23,9 @@ export type VirtualElementNode = {
 	$$type: 'element'
 	node: {
 		type: string
-		props: Record<string, any>
-		children: (VirtualTextNode | VirtualElementNode | VirtualComponentNode)[]
+		props: Record<string, any> & {
+			children: (VirtualTextNode | VirtualElementNode | VirtualComponentNode)[]
+		}
 	}
 	dom: HTMLElement
 	key?: string | number | null

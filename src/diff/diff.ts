@@ -1,16 +1,18 @@
 import { diffChildren } from './diffChildren'
 import { diffProps } from './diffProps'
 import { render } from '../DOM/render'
-import { isFunction } from '../utils'
 import { VirtualTextNode, VirtualElementNode, VirtualComponentNode, VirtualNode, Patch } from '../types'
 import { mount } from '../DOM/mount'
 import { diffComponents } from './diffComponents'
+import { getDOM } from '../DOM/getDOM'
+import { isFunctionalComponent } from '../utils/isFunctionalComponent'
 
 export const diff = (oldNode: VirtualTextNode | VirtualElementNode | VirtualComponentNode, newNode: VirtualNode): Patch => {
 	if (newNode === null) {
 		return () => {
 			if (oldNode.$$type === 'component') {
 				oldNode.node.destroy()
+				return null
 			}
 
 			oldNode?.dom?.remove()
@@ -33,7 +35,11 @@ export const diff = (oldNode: VirtualTextNode | VirtualElementNode | VirtualComp
 
 		return () => {
 			const rendered = render(newNode)
-			mount(rendered, (node) => oldNode.dom?.replaceWith(node))
+			mount(rendered, (node) => getDOM(oldNode)?.replaceWith(node))
+
+			if (oldNode.$$type === 'component') {
+				oldNode.node.destroy()
+			}
 
 			return rendered
 		}
@@ -48,13 +54,13 @@ export const diff = (oldNode: VirtualTextNode | VirtualElementNode | VirtualComp
 		}
 	}
 
-	if (oldNode.$$type === 'component' || isFunction(newNode.type)) {
+	if (oldNode.$$type === 'component' || isFunctionalComponent(newNode.type)) {
 		// @ts-ignore
 		return diffComponents(oldNode, newNode)
 	}
 
-	const propsPatch = diffProps((oldNode as VirtualElementNode).node.props, newNode.props)
-	const childrenPatch = diffChildren((oldNode as VirtualElementNode).node.children, newNode.children)
+	const propsPatch = diffProps(oldNode.node.props, newNode.props)
+	const childrenPatch = diffChildren(oldNode.node.props.children, newNode.props.children)
 
 	return () => {
 		const newProps = propsPatch(oldNode.dom as HTMLElement)
