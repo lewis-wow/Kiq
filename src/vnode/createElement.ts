@@ -1,12 +1,10 @@
 import { FunctionalComponent } from './component'
-import { InputProps, VirtualChildren } from '../types'
+import { InputProps, Props, VirtualChildren } from '../types'
 import { isFunctionalComponent } from '../utils/isFunctionalComponent'
 
 export type VirtualElement<TType extends keyof HTMLElementTagNameMap | FunctionalComponent = keyof HTMLElementTagNameMap | FunctionalComponent> = {
 	type: TType
-	props: InputProps<TType> & {
-		children: VirtualChildren
-	}
+	props: Props<InputProps<TType>>
 	key?: string | number | null
 	ref?: TType extends keyof HTMLElementTagNameMap ? ((node: HTMLElement) => void) | null : null
 }

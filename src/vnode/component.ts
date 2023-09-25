@@ -1,15 +1,15 @@
 import { render } from '../DOM/render'
-import { VirtualComponentNode, VirtualElementNode, VirtualNode, VirtualTextNode } from '../types'
+import { InputProps, VirtualComponentNode, VirtualElementNode, VirtualNode, VirtualTextNode } from '../types'
 
-export class Component<TProps extends object = any> {
+export class Component {
 	rendered: VirtualTextNode | VirtualElementNode | VirtualComponentNode | null = null
 	hooks: any[] = []
 	destroymentCallbacks: (() => void)[] = []
 	currentHookIndex = 0
 
-	constructor(public functionalComponent: FunctionalComponent<TProps>) {}
+	constructor(public functionalComponent: FunctionalComponent<InputProps<FunctionalComponent>>) {}
 
-	render(props: TProps) {
+	render(props: InputProps<FunctionalComponent>) {
 		const functionalComponentVirualNode = this.functionalComponent(props)
 		this.currentHookIndex = 0 // reset for next rerender
 		this.rendered = render(functionalComponentVirualNode)

@@ -22,7 +22,7 @@ export function render(node: string | number | VirtualElement | null): VirtualTe
 	}
 
 	if (isFunctionalComponent(node.type)) {
-		const component = new Component<InputProps<FunctionalComponent>>(node.type)
+		const component = new Component(node.type)
 		component.render(node.props as InputProps<FunctionalComponent>)
 
 		return {

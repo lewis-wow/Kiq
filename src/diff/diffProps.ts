@@ -1,12 +1,16 @@
 import { getEventName } from '../DOM/getEventName'
 import { isEvent } from '../DOM/isEvent'
 import { isProperty } from '../DOM/isProperty'
+import { VirtualElementNode } from '../types'
 import { isObject } from '../utils'
+import { VirtualElement } from '../vnode/createElement'
+import { Patch } from './diff'
 import { propertyAttributeMap } from './propertyAttributeMap'
 
-export type PropsPatch = (node: HTMLElement | Text) => Record<string, any>
+export const diffProps = (oldNode: VirtualElementNode, newNode: VirtualElement<keyof HTMLElementTagNameMap>): Patch<VirtualElementNode> => {
+	const oldProps = oldNode.node.props
+	const newProps = newNode.props
 
-export const diffProps = (oldProps: Record<string, any>, newProps: Record<string, any>): PropsPatch => {
 	const propsPatches: ((node: HTMLElement | Text) => void)[] = []
 	const updatedProps: Record<string, any> = oldProps
 
@@ -69,9 +73,15 @@ export const diffProps = (oldProps: Record<string, any>, newProps: Record<string
 			}
 		})
 
-	return (node) => {
-		for (const patch of propsPatches) patch(node)
+	return () => {
+		for (const patch of propsPatches) patch(oldNode.dom)
 
-		return updatedProps
+		return {
+			...oldNode,
+			props: {
+				...updatedProps,
+				children: oldNode.node.props.children,
+			},
+		}
 	}
 }
