@@ -3,9 +3,9 @@ import { diffProps } from './diffProps'
 import { render } from '../DOM/render'
 import { VirtualTextNode, VirtualElementNode, VirtualComponentNode, VirtualNode, Patch } from '../types'
 import { mount } from '../DOM/mount'
-import { diffComponents } from './diffComponents'
 import { getDOM } from '../DOM/getDOM'
 import { isFunctionalComponent } from '../utils/isFunctionalComponent'
+import { VirtualElement } from '../vnode/createElement'
 
 export const diff = (oldNode: VirtualTextNode | VirtualElementNode | VirtualComponentNode, newNode: VirtualNode): Patch => {
 	if (newNode === null) {
@@ -55,27 +55,34 @@ export const diff = (oldNode: VirtualTextNode | VirtualElementNode | VirtualComp
 	}
 
 	if (oldNode.$$type === 'component' || isFunctionalComponent(newNode.type)) {
-		// @ts-ignore
-		return diffComponents(oldNode, newNode)
+		return () => null
+	}
+
+	if (oldNode.node.type !== newNode.type) {
+		return () => {
+			const rendered = render(newNode)
+			mount(rendered, (node) => oldNode.dom.replaceWith(node))
+
+			return rendered
+		}
 	}
 
 	const propsPatch = diffProps(oldNode.node.props, newNode.props)
 	const childrenPatch = diffChildren(oldNode.node.props.children, newNode.props.children)
 
 	return () => {
-		const newProps = propsPatch(oldNode.dom as HTMLElement)
-		const newChildren = childrenPatch(oldNode.dom as HTMLElement)
+		const newProps = propsPatch(oldNode.dom)
+		const newChildren = childrenPatch(oldNode.dom)
 
 		return {
-			dom: oldNode.dom as HTMLElement,
-			node: {
-				children: newChildren.filter((child): child is VirtualTextNode | VirtualComponentNode | VirtualElementNode => child !== null),
-				props: newProps,
-				type: newNode.type as string,
-			},
 			$$type: 'element',
-			key: newNode.key,
-			ref: newNode.ref,
+			node: {
+				props: { ...newProps, children: newChildren.filter((child): child is VirtualTextNode | VirtualComponentNode | VirtualElementNode => child !== null) },
+				type: (newNode as VirtualElement<keyof HTMLElementTagNameMap>).type,
+			},
+			dom: oldNode.dom,
+			key: (newNode as VirtualElement<keyof HTMLElementTagNameMap>).key,
+			ref: (newNode as VirtualElement<keyof HTMLElementTagNameMap>).ref,
 		}
 	}
 }

@@ -44,8 +44,13 @@ export function render(node: string | number | VirtualElement | null): VirtualTe
 			return Object.assign(element[key], node.props[key])
 		}
 
-		// @ts-ignore
-		element[key] = node.props[key]
+		if (key in element) {
+			// @ts-ignore
+			element[key] = node.props[key]
+			return
+		}
+
+		element.setAttribute(key, node.props[key])
 	})
 
 	const renderedChildren: (VirtualComponentNode | VirtualElementNode | VirtualTextNode)[] = []

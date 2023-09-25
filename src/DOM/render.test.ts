@@ -56,3 +56,17 @@ test('render component inside component', () => {
 		</button>
 	`)
 })
+
+test('render div virtual node with dataset and aria', () => {
+	const divVirtualNode = createElement('div', { 'data-key': 'key', 'aria-valuenow': 10 }, 'Hello world')
+	const rendered = render(divVirtualNode)
+
+	expect(rendered.dom).toMatchInlineSnapshot(`
+		<div
+		  aria-valuenow="10"
+		  data-key="key"
+		>
+		  Hello world
+		</div>
+	`)
+})
