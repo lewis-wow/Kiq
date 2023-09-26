@@ -23,7 +23,8 @@ export function render(node: string | number | VirtualElement | null): VirtualTe
 
 	if (isFunctionalComponent(node.type)) {
 		const component = new Component(node.type)
-		component.render(node.props as InputProps<FunctionalComponent>)
+		const virtualNode = component.render(node.props as InputProps<FunctionalComponent>)
+		component.rendered = render(virtualNode)
 
 		return {
 			$$type: 'component',

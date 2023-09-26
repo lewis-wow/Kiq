@@ -1,4 +1,3 @@
-import { render } from '../DOM/render'
 import { InputProps, VirtualComponentNode, VirtualElementNode, VirtualNode, VirtualTextNode } from '../types'
 
 export class Component {
@@ -10,11 +9,7 @@ export class Component {
 	constructor(public functionalComponent: FunctionalComponent<InputProps<FunctionalComponent>>) {}
 
 	render(props: InputProps<FunctionalComponent>) {
-		const functionalComponentVirualNode = this.functionalComponent(props)
-		this.currentHookIndex = 0 // reset for next rerender
-		this.rendered = render(functionalComponentVirualNode)
-
-		return this
+		return this.functionalComponent(props)
 	}
 
 	addDestroymentCallback(destroymentCallback: () => void) {

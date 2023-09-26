@@ -2,12 +2,12 @@ import { mount } from '../DOM/mount'
 import { diff } from './diff'
 import { diffReorderChildren } from './diffReorderChildren'
 import { render } from '../DOM/render'
-import { VirtualFragmentNode, VirtualNode, VirtualElementNode, VirtualTextNode, VirtualComponentNode } from '../types'
+import { VirtualNodeChildren, VirtualNode, VirtualElementNode, VirtualTextNode, VirtualComponentNode } from '../types'
 import { isNullish, isObject } from '../utils'
 
 function keyToIndex(children: VirtualNode[]): { keyed: Record<string, number>; free: number[] }
-function keyToIndex(children: VirtualFragmentNode): { keyed: Record<string, number>; free: number[] }
-function keyToIndex(children: VirtualFragmentNode | VirtualNode[]) {
+function keyToIndex(children: VirtualNodeChildren): { keyed: Record<string, number>; free: number[] }
+function keyToIndex(children: VirtualNodeChildren | VirtualNode[]) {
 	const keyed: Record<string, number> = {}
 	const free: number[] = []
 
@@ -27,12 +27,12 @@ function keyToIndex(children: VirtualFragmentNode | VirtualNode[]) {
 	return { keyed, free }
 }
 
-export type ChildrenPatch = (node: HTMLElement) => VirtualFragmentNode
+export type ChildrenPatch = (node: HTMLElement) => VirtualNodeChildren
 
-export const diffChildren = (oldChildren: VirtualFragmentNode, newChildren: VirtualNode[]): ChildrenPatch => {
+export const diffChildren = (oldChildren: VirtualNodeChildren, newChildren: VirtualNode[]): ChildrenPatch => {
 	const childPatches: (() => void)[] = []
 	const additionalPatches: ((node: HTMLElement) => void)[] = []
-	const updatedChildren: VirtualFragmentNode = [...oldChildren]
+	const updatedChildren: VirtualNodeChildren = [...oldChildren]
 
 	const { keyed: keyedOld, free: freeOld } = keyToIndex(oldChildren)
 	const { keyed: keyedNew, free: freeNew } = keyToIndex(newChildren)
